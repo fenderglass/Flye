@@ -238,6 +238,9 @@ def _run(args):
                     overwrite=not args.resume and not args.resume_from)
 
     logger.info("Running ABruijn")
+    logger.info("  Run invoked with following parameters:")
+    for arg in vars(args):
+        logger.info("    {}: {}".format(arg,getattr(args, arg)))    
     aln.check_binaries()
     pol.check_binaries()
     asm.check_binaries()
