@@ -78,7 +78,7 @@ Assembly graph
 
 The Flye algorithms are using repeat graph as a core data structure. 
 The edges in this graph represent genomic sequences, and nodes define the
-sequence junctions. The genoime traverses this graph (in an unknown way) 
+sequence junctions. The genome traverses this graph (in an unknown way) 
 so as each unique edge is covered exactly once. The unresolved genomic repeats 
 are collapsed into the corresponding edges in the graph
 (therefore genome structure remain umbigious).
