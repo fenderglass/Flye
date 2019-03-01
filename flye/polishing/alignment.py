@@ -308,7 +308,7 @@ def make_alignment(reference_file, reads_file, num_proc,
         merged_file = out_alignment + "_merged"
         env = os.environ.copy()
         env["LC_ALL"] = "C"
-        subprocess.check_call(["sort", "-k", "3,3", "-T", work_dir, out_alignment],
+        subprocess.check_call(["sort", "--parallel="+str(num_proc), "-k", "3,3", "-T", work_dir, out_alignment],
                               stdout=open(sorted_file, "w"), env=env)
 
         #puting back SAM headers
