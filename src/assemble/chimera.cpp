@@ -4,8 +4,6 @@
 
 #include <vector>
 #include <iostream>
-#include <unordered_set>
-#include <unordered_map>
 #include <iomanip>
 #include <cmath>
 
@@ -64,7 +62,7 @@ void ChimeraDetector::estimateGlobalCoverage()
 	//				(int)Config::get("max_coverage_drop_rate");
 	int flankSize = 0;
 
-	std::unordered_map<int32_t, int32_t> readHist;
+	ska::flat_hash_map<int32_t, int32_t> readHist;
 	std::vector<int32_t> covList;
 	
 	//std::ofstream fout("../cov_hist.txt");

@@ -4,7 +4,6 @@
 
 #include <stdexcept>
 #include <iostream>
-#include <unordered_set>
 #include <algorithm>
 #include <queue>
 
@@ -164,7 +163,7 @@ void VertexIndex::buildIndexUnevenCoverage(int minCoverage, float selectRate,
 	{
 		if (!readId.strand()) return;
 
-		thread_local std::unordered_map<Kmer, size_t> localFreq;
+		thread_local ska::flat_hash_map<Kmer, size_t> localFreq;
 		localFreq.clear();
 		std::vector<KmerFreq> topKmers(_seqContainer.seqLen(readId));
 
@@ -226,7 +225,7 @@ void VertexIndex::buildIndexUnevenCoverage(int minCoverage, float selectRate,
 	{
 		if (!readId.strand()) return;
 
-		thread_local std::unordered_map<Kmer, size_t> localFreq;
+		thread_local ska::flat_hash_map<Kmer, size_t> localFreq;
 		localFreq.clear();
 		std::vector<KmerFreq> topKmers(_seqContainer.seqLen(readId));
 

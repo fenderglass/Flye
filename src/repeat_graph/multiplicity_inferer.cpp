@@ -16,7 +16,7 @@ void MultiplicityInferer::estimateCoverage()
 	//const int SHORT_EDGE = Config::get("unique_edge_length");
 
 	//alternative coverage
-	std::unordered_map<GraphEdge*, std::vector<int32_t>> wndCoverage;
+	ska::flat_hash_map<GraphEdge*, std::vector<int32_t>> wndCoverage;
 
 	for (auto& edge : _graph.iterEdges())
 	{
@@ -107,7 +107,7 @@ void MultiplicityInferer::removeUnsupportedEdges()
 	}
 	Logger::get().debug() << "Read coverage cutoff: " << coverageThreshold;
 
-	std::unordered_set<GraphEdge*> edgesRemove;
+	ska::flat_hash_set<GraphEdge*> edgesRemove;
 	for (auto& path : unbranchingPaths)
 	{
 		if (!path.id.strand()) continue;
@@ -132,8 +132,8 @@ void MultiplicityInferer::removeUnsupportedEdges()
 
 void MultiplicityInferer::removeUnsupportedConnections()
 {
-	std::unordered_map<GraphEdge*, int32_t> rightConnections;
-	std::unordered_map<GraphEdge*, int32_t> leftConnections;
+	ska::flat_hash_map<GraphEdge*, int32_t> rightConnections;
+	ska::flat_hash_map<GraphEdge*, int32_t> leftConnections;
 
 	for (auto& readPath : _aligner.getAlignments())
 	{
@@ -223,8 +223,8 @@ void MultiplicityInferer::collapseHeterozygousLoops()
 	GraphProcessor proc(_graph, _asmSeqs);
 	auto unbranchingPaths = proc.getUnbranchingPaths();
 
-	std::unordered_set<FastaRecord::Id> toUnroll;
-	std::unordered_set<FastaRecord::Id> toRemove;
+	ska::flat_hash_set<FastaRecord::Id> toUnroll;
+	ska::flat_hash_set<FastaRecord::Id> toRemove;
 	for (auto& loop : unbranchingPaths)
 	{
 		if (!loop.isLooped()) continue;
@@ -310,10 +310,10 @@ void MultiplicityInferer::trimTips()
 	const int MIN_COV_DIFF = 3;
 
 	//const int TIP_THRESHOLD = Config::get("tip_length_threshold");
-	std::unordered_set<FastaRecord::Id> toRemove;
+	ska::flat_hash_set<FastaRecord::Id> toRemove;
 	GraphProcessor proc(_graph, _asmSeqs);
 	auto unbranchingPaths = proc.getUnbranchingPaths();
-	std::unordered_map<GraphEdge*, UnbranchingPath*> ubIndex;
+	ska::flat_hash_map<GraphEdge*, UnbranchingPath*> ubIndex;
 	for (auto& path : unbranchingPaths)
 	{
 		for (auto& edge: path.path) ubIndex[edge] = &path;
@@ -385,7 +385,7 @@ void MultiplicityInferer::collapseHeterozygousBulges()
 	GraphProcessor proc(_graph, _asmSeqs);
 	auto unbranchingPaths = proc.getUnbranchingPaths();
 
-	std::unordered_set<FastaRecord::Id> toSeparate;
+	ska::flat_hash_set<FastaRecord::Id> toSeparate;
 	for (auto& path : unbranchingPaths)
 	{
 		if (path.isLooped()) continue;

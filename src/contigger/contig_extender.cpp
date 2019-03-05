@@ -39,13 +39,13 @@ void ContigExtender::generateContigs()
 
 	OutputGenerator outGen(_graph, _aligner, _readSeqs);
 	auto coreSeqs = outGen.generatePathSequences(_unbranchingPaths);
-	std::unordered_map<UnbranchingPath*, FastaRecord*> upathsSeqs;
+	ska::flat_hash_map<UnbranchingPath*, FastaRecord*> upathsSeqs;
 	for (size_t i = 0; i < _unbranchingPaths.size(); ++i)
 	{
 		upathsSeqs[&_unbranchingPaths[i]] = &coreSeqs[i];
 	}
 
-	std::unordered_map<GraphEdge*, 
+	ska::flat_hash_map<GraphEdge*, 
 					   std::vector<const GraphAlignment*>> alnIndex;
 	for (auto& aln : _aligner.getAlignments())
 	{
@@ -58,8 +58,8 @@ void ContigExtender::generateContigs()
 		}
 	}
 
-	std::unordered_set<GraphEdge*> coveredRepeats;
-	std::unordered_map<const GraphEdge*, bool> repeatDirections;
+	ska::flat_hash_set<GraphEdge*> coveredRepeats;
+	ska::flat_hash_map<const GraphEdge*, bool> repeatDirections;
 	auto canTraverse = [&repeatDirections] (const GraphEdge* edge)
 	{
 		//if (edge->isLooped() && edge->selfComplement) return false;
@@ -165,7 +165,7 @@ void ContigExtender::generateContigs()
 		return PathAndSeq(extendedPath, extendedSeq);
 	};
 
-	std::unordered_map<FastaRecord::Id, UnbranchingPath*> idToPath;
+	ska::flat_hash_map<FastaRecord::Id, UnbranchingPath*> idToPath;
 	for (auto& ctg : _unbranchingPaths)
 	{
 		idToPath[ctg.id] = &ctg;
@@ -350,8 +350,8 @@ void ContigExtender::outputScaffoldConnections(const std::string& filename)
 	auto reachableEdges = [this](GraphEdge* edge)
 	{
 		std::vector<GraphEdge*> dfsStack;
-		std::unordered_set<GraphEdge*> visited;
-		std::unordered_set<GraphEdge*> reachableUnique;
+		ska::flat_hash_set<GraphEdge*> visited;
+		ska::flat_hash_set<GraphEdge*> reachableUnique;
 
 		dfsStack.push_back(edge);
 		while(!dfsStack.empty())

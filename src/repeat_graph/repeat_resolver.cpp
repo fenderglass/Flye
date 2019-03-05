@@ -59,7 +59,7 @@ void RepeatResolver::separatePath(const GraphPath& graphPath,
 int RepeatResolver::resolveConnections(const std::vector<Connection>& connections, 
 									   float minSupport)
 {
-	std::unordered_map<FastaRecord::Id, 
+	ska::flat_hash_map<FastaRecord::Id, 
 					   std::vector<const Connection*>> connectIndex;
 	for (auto& conn : connections)
 	{
@@ -70,11 +70,11 @@ int RepeatResolver::resolveConnections(const std::vector<Connection>& connection
 	}
 
 	//Constructs transitions graph using the lemon library
-	std::unordered_map<FastaRecord::Id, int> leftCoverage;
-	std::unordered_map<FastaRecord::Id, int> rightCoverage;
+	ska::flat_hash_map<FastaRecord::Id, int> leftCoverage;
+	ska::flat_hash_map<FastaRecord::Id, int> rightCoverage;
 
-	std::unordered_map<FastaRecord::Id, int> asmToLemon;
-	std::unordered_map<int, FastaRecord::Id> lemonToAsm;
+	ska::flat_hash_map<FastaRecord::Id, int> asmToLemon;
+	ska::flat_hash_map<int, FastaRecord::Id> lemonToAsm;
 	lemon::ListGraph graph;
 	lemon::ListGraph::EdgeMap<int> edgeWeights(graph);
 
@@ -128,7 +128,7 @@ int RepeatResolver::resolveConnections(const std::vector<Connection>& connection
 	matcher.run();
 
 	//converting matching to the resolved paths on the graph
-	std::unordered_set<FastaRecord::Id> usedEdges;
+	ska::flat_hash_set<FastaRecord::Id> usedEdges;
 	std::vector<Connection> uniqueConnections;
 	int unresolvedLinks = 0;
 	for (auto lemonAsm : lemonToAsm)
@@ -209,8 +209,8 @@ int RepeatResolver::resolveConnections(const std::vector<Connection>& connection
 bool RepeatResolver::checkByReadExtension(const GraphEdge* checkEdge,
 										  const std::vector<GraphAlignment>& alignments)
 {
-	std::unordered_map<GraphEdge*, std::vector<int>> outFlanks;
-	std::unordered_map<GraphEdge*, std::vector<int>> outSpans;
+	ska::flat_hash_map<GraphEdge*, std::vector<int>> outFlanks;
+	ska::flat_hash_map<GraphEdge*, std::vector<int>> outSpans;
 	int lowerBound = 0;
 	for (auto& aln : alignments)
 	{ 
@@ -306,7 +306,7 @@ void RepeatResolver::findRepeats()
 {
 	Logger::get().debug() << "Finding repeats";
 
-	std::unordered_map<GraphEdge*, 
+	ska::flat_hash_map<GraphEdge*, 
 					   std::vector<GraphAlignment>> alnIndex;
 	for (auto& aln : _aligner.getAlignments())
 	{
@@ -328,7 +328,7 @@ void RepeatResolver::findRepeats()
 	//Will operate on unbranching paths rather than single edges
 	GraphProcessor proc(_graph, _asmSeqs);
 	auto unbranchingPaths = proc.getUnbranchingPaths();
-	std::unordered_map<FastaRecord::Id, UnbranchingPath*> idToPath;
+	ska::flat_hash_map<FastaRecord::Id, UnbranchingPath*> idToPath;
 	for (auto& path : unbranchingPaths) idToPath[path.id] = &path;
 	auto complPath = [&idToPath](UnbranchingPath* path)
 	{
@@ -377,7 +377,7 @@ void RepeatResolver::findRepeats()
 		//tandem repeats
 		/*if (path.path.size() == 1 && path.path.front()->isLooped())
 		{
-			std::unordered_set<FastaRecord::Id> seen;
+			ska::flat_hash_set<FastaRecord::Id> seen;
 			for (auto& seg : path.path.front()->seqSegments)
 			{
 				if (seen.count(seg.origSeqId))
@@ -634,7 +634,7 @@ void RepeatResolver::clearResolvedRepeats()
 		return edge->resolved;
 	};
 
-	std::unordered_set<GraphNode*> toRemove;
+	ska::flat_hash_set<GraphNode*> toRemove;
 
 	for (auto& node : _graph.iterNodes())
 	{

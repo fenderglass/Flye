@@ -5,7 +5,6 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
 #include <string>
 #include <limits>
 
@@ -259,7 +258,7 @@ private:
 	SequenceIndex 	_seqIndex;
 	size_t 			_seqIdOffest;
 	bool   			_offsetInitialized;
-	std::unordered_map<std::string, 
+	ska::flat_hash_map<std::string, 
 					   FastaRecord::Id> _nameIndex;
 
 	//global/local position convertions

@@ -18,10 +18,10 @@ std::vector<FastaRecord> OutputGenerator::
 		//As each edge might correspond to multiple sequences,
 		//we need to select them so as to minimize the
 		//number of original contigs (that were used to build the graph)
-		std::unordered_map<FastaRecord::Id, int> seqIdFreq;
+		ska::flat_hash_map<FastaRecord::Id, int> seqIdFreq;
 		for (auto& edge : contig.path) 
 		{
-			std::unordered_set<FastaRecord::Id> edgeSeqIds;
+			ska::flat_hash_set<FastaRecord::Id> edgeSeqIds;
 			for (auto& seg: edge->seqSegments) 
 			{
 				edgeSeqIds.insert(seg.origSeqId);
@@ -157,13 +157,13 @@ void OutputGenerator::dumpRepeats(const std::vector<UnbranchingPath>& paths,
 			contig.path.front()->selfComplement) continue;
 
 		bool isSimple = true;
-		std::unordered_set<GraphEdge*> inputs;
+		ska::flat_hash_set<GraphEdge*> inputs;
 		for (auto& edge : contig.path.front()->nodeLeft->inEdges)
 		{
 			inputs.insert(edge);
 			if (edge->isRepetitive()) isSimple = false;
 		}
-		std::unordered_set<GraphEdge*> outputs;
+		ska::flat_hash_set<GraphEdge*> outputs;
 		for (auto& edge : contig.path.back()->nodeRight->outEdges)
 		{
 			outputs.insert(edge);
@@ -172,14 +172,14 @@ void OutputGenerator::dumpRepeats(const std::vector<UnbranchingPath>& paths,
 		if (!isSimple || inputs.size() != outputs.size() ||
 			inputs.size() < 2) continue;
 
-		std::unordered_set<GraphEdge*> innerEdges(contig.path.begin(), 
+		ska::flat_hash_set<GraphEdge*> innerEdges(contig.path.begin(), 
 												  contig.path.end());
 
-		std::unordered_set<FastaRecord::Id> allReads;
-		std::unordered_map<GraphEdge*, 
-						   std::unordered_set<FastaRecord::Id>> inputEdges;
-		std::unordered_map<GraphEdge*, 
-						   std::unordered_set<FastaRecord::Id>> outputEdges;
+		ska::flat_hash_set<FastaRecord::Id> allReads;
+		ska::flat_hash_map<GraphEdge*, 
+						   ska::flat_hash_set<FastaRecord::Id>> inputEdges;
+		ska::flat_hash_map<GraphEdge*, 
+						   ska::flat_hash_set<FastaRecord::Id>> outputEdges;
 
 
 		fout << "#Repeat " << contig.id.signedId() << "\t"
@@ -329,7 +329,7 @@ void OutputGenerator::outputDot(const std::vector<UnbranchingPath>& paths,
 	fout << "node [shape = circle, label = \"\", height = 0.3];\n";
 	
 	///re-enumerating helper functions
-	std::unordered_map<GraphNode*, int> nodeIds;
+	ska::flat_hash_map<GraphNode*, int> nodeIds;
 	int nextNodeId = 0;
 	auto nodeToId = [&nodeIds, &nextNodeId](GraphNode* node)
 	{
@@ -355,8 +355,8 @@ void OutputGenerator::outputDot(const std::vector<UnbranchingPath>& paths,
 								  "darkgoldenrod1", "deepskyblue1", 
 								  "darkolivegreen3"};
 	std::vector<GraphEdge*> dfsStack;
-	std::unordered_set<GraphEdge*> visited;
-	std::unordered_map<GraphEdge*, std::string> edgeColors;
+	ska::flat_hash_set<GraphEdge*> visited;
+	ska::flat_hash_map<GraphEdge*, std::string> edgeColors;
 	size_t colorId = 0;
 	for (auto& edge: _graph.iterEdges())
 	{

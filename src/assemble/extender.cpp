@@ -16,7 +16,7 @@
 Extender::ExtensionInfo Extender::extendContig(FastaRecord::Id startRead)
 {
 
-	std::unordered_set<FastaRecord::Id> currentReads;
+	ska::flat_hash_set<FastaRecord::Id> currentReads;
 	currentReads.insert(startRead);
 	currentReads.insert(startRead.rc());
 
@@ -285,8 +285,8 @@ void Extender::assembleContigs()
 		Logger::get().debug() << "Ovlp index size: " << _ovlpContainer.indexSize();
 		
 		//update inner read index
-		std::unordered_set<FastaRecord::Id> rightExtended;
-		std::unordered_set<FastaRecord::Id> leftExtended;
+		ska::flat_hash_set<FastaRecord::Id> rightExtended;
+		ska::flat_hash_set<FastaRecord::Id> leftExtended;
 		std::vector<OverlapRange> allOverlaps;
 		for (const auto& readId : exInfo.reads)
 		{
@@ -358,7 +358,7 @@ void Extender::assembleContigs()
 							_readsContainer.seqLen(idTwo);});
 
 		int singletonsAdded = 0;
-		std::unordered_set<FastaRecord::Id> coveredLocal;
+		ska::flat_hash_set<FastaRecord::Id> coveredLocal;
 		for (const auto& readId : sortedByLength)
 		{
 			if (!coveredLocal.count(readId))
@@ -392,7 +392,7 @@ std::vector<FastaRecord::Id>
 	static const int WINDOW = Config::get("chimera_window");
 	static const int OVERHANG = Config::get("maximum_overhang");
 
-	std::unordered_map<FastaRecord::Id, 
+	ska::flat_hash_map<FastaRecord::Id, 
 					   std::vector<int32_t>> readsCoverage;
 	for (const auto& ovlp: ovlps)
 	{

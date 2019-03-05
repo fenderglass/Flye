@@ -39,7 +39,7 @@ private:
 		int32_t startOne;
 		int32_t startTwo;
 	};
-	typedef std::unordered_map<const OverlapRange*, 
+	typedef ska::flat_hash_map<const OverlapRange*, 
 							   AlignmentInfo> AlignmentsMap;
 
 	FastaRecord generateLinear(const ContigPath& path, 

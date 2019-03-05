@@ -5,7 +5,7 @@
 #pragma once
 
 #include <unistd.h>
-#include <unordered_map>
+#include "flat_hash_map/flat_hash_map.hpp"
 #include <fstream>
 #include "logger.h"
 #include "utils.h"
@@ -69,7 +69,7 @@ public:
 
 private:
 	Config(){}
-	std::unordered_map<std::string, float> _parameters;
+	ska::flat_hash_map<std::string, float> _parameters;
 };
 
 struct Parameters

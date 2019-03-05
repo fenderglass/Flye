@@ -27,7 +27,7 @@ void GraphProcessor::simplify()
 void GraphProcessor::fixChimericJunctions()
 {
 	//a very specific case: 1 in - 1 out
-	std::unordered_set<GraphNode*> simpleCases;
+	ska::flat_hash_set<GraphNode*> simpleCases;
 	for (auto& node : _graph.iterNodes())
 	{
 		if (!node->isBifurcation() &&
@@ -47,7 +47,7 @@ void GraphProcessor::fixChimericJunctions()
 	}
 
 	//more common case: 2 in - 2 out
-	std::unordered_set<GraphNode*> complexCases;
+	ska::flat_hash_set<GraphNode*> complexCases;
 	for (auto& node : _graph.iterNodes())
 	{
 		if (node->inEdges.size() != 2 ||
@@ -87,7 +87,7 @@ void GraphProcessor::fixChimericJunctions()
 void GraphProcessor::collapseBulges()
 {
 	const int MAX_BUBBLE = Parameters::get().minimumOverlap;
-	std::unordered_set<std::pair<GraphNode*, GraphNode*>,
+	ska::flat_hash_set<std::pair<GraphNode*, GraphNode*>,
 					   pairhash> toFix;
 	//finding the bubbles
 	for (auto& edge : _graph.iterEdges())
@@ -141,7 +141,7 @@ void GraphProcessor::collapseBulges()
 /*void GraphProcessor::trimTips()
 {
 	const int TIP_THRESHOLD = Config::get("tip_length_threshold");
-	std::unordered_set<GraphEdge*> toRemove;
+	ska::flat_hash_set<GraphEdge*> toRemove;
 	for (GraphEdge* tipEdge : _graph.iterEdges())
 	{
 		int rightOut = tipEdge->nodeRight->outEdges.size();
@@ -280,7 +280,7 @@ void GraphProcessor::condenceEdges()
 		//Logger::get().debug() << "Collapsed: " << unbranchingPath.edgesStr() 
 		//	<< " to " << addedStr;
 
-		std::unordered_set<GraphEdge*> toRemove;
+		ska::flat_hash_set<GraphEdge*> toRemove;
 		for (auto& edge : unbranchingPath.path) toRemove.insert(edge);
 		for (auto& edge : complPath) toRemove.insert(edge);
 		for (auto& edge : toRemove) _graph.removeEdge(edge);
@@ -311,7 +311,7 @@ std::vector<UnbranchingPath> GraphProcessor::getEdgesPaths() const
 //Finds unbranching paths
 std::vector<UnbranchingPath> GraphProcessor::getUnbranchingPaths() const
 {
-	std::unordered_map<FastaRecord::Id, size_t> edgeIds;
+	ska::flat_hash_map<FastaRecord::Id, size_t> edgeIds;
 	size_t nextEdgeId = 0;
 	auto pathToId = [&edgeIds, &nextEdgeId](GraphPath path)
 	{
@@ -329,7 +329,7 @@ std::vector<UnbranchingPath> GraphProcessor::getUnbranchingPaths() const
 	};
 	
 	std::vector<UnbranchingPath> unbranchingPaths;
-	std::unordered_set<GraphEdge*> visitedEdges;
+	ska::flat_hash_set<GraphEdge*> visitedEdges;
 	for (auto edge : _graph.iterEdges())
 	{
 		if (visitedEdges.count(edge)) continue;

@@ -114,7 +114,7 @@ void ReadAligner::alignReads()
 	static const int EDGE_FLANK = 100;
 
 	//create database
-	std::unordered_map<FastaRecord::Id, 
+	ska::flat_hash_map<FastaRecord::Id, 
 					   std::pair<GraphEdge*, EdgeSequence>> idToSegment;
 	for (auto& edge : _graph.iterEdges())
 	{

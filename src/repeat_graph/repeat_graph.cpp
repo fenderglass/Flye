@@ -46,9 +46,9 @@ bool GraphEdge::isTip() const
 	return nodeLeft->inEdges.empty() || nodeRight->outEdges.empty();
 }
 
-std::unordered_set<GraphEdge*> GraphEdge::adjacentEdges()
+ska::flat_hash_set<GraphEdge*> GraphEdge::adjacentEdges()
 {
-	std::unordered_set<GraphEdge*> edges;
+	ska::flat_hash_set<GraphEdge*> edges;
 	for (auto& e: nodeLeft->inEdges) edges.insert(e);
 	for (auto& e: nodeLeft->outEdges) edges.insert(e);
 	for (auto& e: nodeRight->inEdges) edges.insert(e);
@@ -105,7 +105,7 @@ void RepeatGraph::getGluepoints(OverlapContainer& asmOverlaps)
 	
 	Logger::get().debug() << "Computing gluepoints";
 	typedef SetNode<Point2d> SetPoint2d;
-	std::unordered_map<FastaRecord::Id, SetVec<Point2d>> endpoints;
+	ska::flat_hash_map<FastaRecord::Id, SetVec<Point2d>> endpoints;
 
 	//first, extract endpoints from all overlaps.
 	//each point has X and Y coordinates (curSeq and extSeq)
@@ -150,8 +150,8 @@ void RepeatGraph::getGluepoints(OverlapContainer& asmOverlaps)
 	auto clusters = groupBySet(flatEndpoints);
 
 	typedef SetNode<Point1d> SetPoint1d;
-	std::unordered_map<FastaRecord::Id, SetVec<Point1d>> tempGluepoints;
-	std::unordered_map<SetPoint1d*, SetPoint1d*> complements;
+	ska::flat_hash_map<FastaRecord::Id, SetVec<Point1d>> tempGluepoints;
+	ska::flat_hash_map<SetPoint1d*, SetPoint1d*> complements;
 
 	//we will now split each cluster based on it's Y coordinates
 	//and project these subgroups to the corresponding sequences
@@ -287,7 +287,7 @@ void RepeatGraph::getGluepoints(OverlapContainer& asmOverlaps)
 	//Generating final gluepoints, we might need to additionally
 	//split long clusters into parts (tandem repeats)
 	size_t pointId = 0;
-	std::unordered_map<SetPoint1d*, size_t> setToId;
+	ska::flat_hash_map<SetPoint1d*, size_t> setToId;
 	auto addConsensusPoint = [&setToId, this, &pointId]
 		(const std::vector<SetPoint1d*>& group)
 	{
@@ -421,9 +421,9 @@ void RepeatGraph::checkGluepointProjections(const OverlapContainer& asmOverlaps)
 	size_t MAX_ITER = 1000;
 	for (size_t i = 0; i < MAX_ITER; ++i)
 	{
-		std::unordered_map<FastaRecord::Id, 
+		ska::flat_hash_map<FastaRecord::Id, 
 						   std::vector<GluePoint>> addedGluepoints;
-		std::unordered_map<size_t, SetNode<size_t>*> mergedGluepoints;
+		ska::flat_hash_map<size_t, SetNode<size_t>*> mergedGluepoints;
 		auto combinePts = [&mergedGluepoints](size_t idOne, size_t idTwo)
 		{
 			if (!mergedGluepoints.count(idOne))
@@ -542,9 +542,9 @@ void RepeatGraph::checkGluepointProjections(const OverlapContainer& asmOverlaps)
 //artifatcs of the alignment
 void RepeatGraph::collapseTandems()
 {
-	std::unordered_map<size_t, std::unordered_set<size_t>> tandemLefts;
-	std::unordered_map<size_t, std::unordered_set<size_t>> tandemRights;
-	std::unordered_set<size_t> bigTandems;
+	ska::flat_hash_map<size_t, ska::flat_hash_set<size_t>> tandemLefts;
+	ska::flat_hash_map<size_t, ska::flat_hash_set<size_t>> tandemRights;
+	ska::flat_hash_set<size_t> bigTandems;
 
 	for (auto& seqPoints : _gluePoints)
 	{
@@ -666,11 +666,11 @@ void RepeatGraph::initializeEdges(const OverlapContainer& asmOverlaps)
 	Logger::get().debug() << "Initializing edges";
 
 	typedef std::pair<GraphNode*, GraphNode*> NodePair;
-	std::unordered_map<NodePair, std::vector<EdgeSequence>, 
+	ska::flat_hash_map<NodePair, std::vector<EdgeSequence>, 
 					   pairhash> parallelSegments;
-	std::unordered_map<NodePair, NodePair, pairhash> complEdges;
+	ska::flat_hash_map<NodePair, NodePair, pairhash> complEdges;
 
-	std::unordered_map<size_t, GraphNode*> nodeIndex;
+	ska::flat_hash_map<size_t, GraphNode*> nodeIndex;
 	auto idToNode = [&nodeIndex, this](size_t nodeId)
 	{
 		if (!nodeIndex.count(nodeId))
@@ -728,7 +728,7 @@ void RepeatGraph::initializeEdges(const OverlapContainer& asmOverlaps)
 						std::max(intBegin, s.origSeqStart), 0);
 	};
 
-	std::unordered_set<NodePair, pairhash> usedPairs;
+	ska::flat_hash_set<NodePair, pairhash> usedPairs;
 	size_t singletonsFiltered = 0;
 	for (auto& nodePairSeqs : parallelSegments)
 	{
@@ -738,7 +738,7 @@ void RepeatGraph::initializeEdges(const OverlapContainer& asmOverlaps)
 		//creating set and building index
 		SetVec<EdgeSequence*> segmentSets;
 		typedef SetNode<EdgeSequence*> SetSegment;
-		std::unordered_map<FastaRecord::Id, 
+		ska::flat_hash_map<FastaRecord::Id, 
 						   std::vector<SetSegment*>> segmentIndex;
 		for (auto& seg : nodePairSeqs.second) 
 		{
@@ -940,7 +940,7 @@ void RepeatGraph::initializeEdges(const OverlapContainer& asmOverlaps)
 void RepeatGraph::logEdges()
 {
 	typedef std::pair<EdgeSequence*, GraphEdge*> SegEdgePair;
-	std::unordered_map<FastaRecord::Id, 
+	ska::flat_hash_map<FastaRecord::Id, 
 					   std::vector<SegEdgePair>> sequenceEdges;
 	for (auto& edge : this->iterEdges())
 	{
@@ -1023,7 +1023,7 @@ GraphNode* RepeatGraph::complementNode(GraphNode* node) const
 void RepeatGraph::storeGraph(const std::string& filename)
 {
 	size_t nextNodeId = 0;
-	std::unordered_map<GraphNode*, size_t> nodeIds;
+	ska::flat_hash_map<GraphNode*, size_t> nodeIds;
 	for (auto& node : this->iterNodes())
 	{
 		nodeIds[node] = nextNodeId++;
@@ -1059,7 +1059,7 @@ void RepeatGraph::loadGraph(const std::string& filename)
 		throw std::runtime_error("Can't open "  + filename);
 	}
 
-	std::unordered_map<size_t, GraphNode*> idToNode;
+	ska::flat_hash_map<size_t, GraphNode*> idToNode;
 	GraphEdge* currentEdge = 0;
 	while(!fin.eof())
 	{
@@ -1150,7 +1150,7 @@ void RepeatGraph::updateEdgeSequences()
 
 RepeatGraph::~RepeatGraph()
 {
-	std::unordered_set<GraphEdge*> toRemove;
+	ska::flat_hash_set<GraphEdge*> toRemove;
 	for (auto& edge : this->iterEdges()) toRemove.insert(edge);
 	for (auto edge : toRemove) this->removeEdge(edge);
 	for (auto node : _graphNodes) delete node;

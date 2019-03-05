@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <unordered_set>
 #include <mutex>
 #include <sstream>
 
@@ -349,6 +348,6 @@ private:
 	OvlpDivStats _divergenceStats;
 	OverlapIndex _overlapIndex;
 	std::atomic<size_t> _indexSize;
-	std::unordered_map<FastaRecord::Id, 
+	ska::flat_hash_map<FastaRecord::Id, 
 					   IntervalTree<const OverlapRange*>> _ovlpTree;
 };

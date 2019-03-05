@@ -3,10 +3,10 @@
 //Released under the BSD license (see LICENSE file)
 
 #include <algorithm>
-#include <unordered_set>
 
 #include "homo_polisher.h"
 #include "../common/matrix.h"
+#include "flat_hash_map/flat_hash_map.hpp"
 
 
 namespace
@@ -285,9 +285,9 @@ size_t HomoPolisher::compareTopTwo(char nucleotide, size_t firstChoice,
 	}
 	
 	//getting common known observations
-	std::unordered_set<uint32_t> fstSet;
+	ska::flat_hash_set<uint32_t> fstSet;
 	for (auto obs : knownObs[0]) fstSet.insert(obs.id);
-	std::unordered_set<uint32_t> commonSet;
+	ska::flat_hash_set<uint32_t> commonSet;
 	for (auto obs : knownObs[1])
 	{
 		if (fstSet.count(obs.id)) commonSet.insert(obs.id);

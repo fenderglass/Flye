@@ -56,5 +56,5 @@ private:
 	const SequenceContainer&   _readSeqs;
 	ReadAligner& _aligner;
 	MultiplicityInferer& _multInf;
-	std::unordered_map<GraphEdge*, int> _substractedCoverage;
+	ska::flat_hash_map<GraphEdge*, int> _substractedCoverage;
 };

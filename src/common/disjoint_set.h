@@ -3,7 +3,7 @@
 //Released under the BSD license (see LICENSE file)
 
 #include <vector>
-#include <unordered_map>
+#include "flat_hash_map/flat_hash_map.hpp"
 
 template <class T>
 struct SetNode
@@ -51,10 +51,10 @@ void unionSet(SetNode<T>* node1, SetNode<T>* node2)
 }
 
 template <typename T>
-std::unordered_map<SetNode<T>*, std::vector<T>> 
+ska::flat_hash_map<SetNode<T>*, std::vector<T>> 
 	groupBySet(const std::vector<SetNode<T>*>& sets)
 {
-	std::unordered_map<SetNode<T>*, std::vector<T>> groups;
+	ska::flat_hash_map<SetNode<T>*, std::vector<T>> groups;
 	for (auto& setNode : sets)
 	{
 		groups[findSet(setNode)].push_back(setNode->data);

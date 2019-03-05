@@ -43,7 +43,7 @@ private:
 	{
 		GraphEdge* leftContig;
 		GraphEdge* rightContig;
-		std::unordered_set<GraphEdge*> repetitiveEdges;
+		ska::flat_hash_set<GraphEdge*> repetitiveEdges;
 	};
 	struct UpathAlignment
 	{
@@ -55,7 +55,7 @@ private:
 	std::vector<UpathAlignment> asUpathAlignment(const GraphAlignment& aln);
 
 	std::vector<UnbranchingPath> _unbranchingPaths;
-	std::unordered_map<GraphEdge*, UnbranchingPath*> _edgeToPath;
+	ska::flat_hash_map<GraphEdge*, UnbranchingPath*> _edgeToPath;
 	std::vector<Contig> _contigs;
 
 	RepeatGraph& _graph;

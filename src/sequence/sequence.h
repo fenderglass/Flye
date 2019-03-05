@@ -9,6 +9,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include "flat_hash_map/flat_hash_map.hpp"
 
 //Immutable dna sequence class
 class DnaSequence

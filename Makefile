@@ -6,7 +6,7 @@ export LEMON = -I${ROOT_DIR}/lib/lemon
 export BIN_DIR = ${ROOT_DIR}/bin
 export MINIMAP2_DIR = ${ROOT_DIR}/lib/minimap2
 
-export CXXFLAGS += ${LIBCUCKOO} ${INTERVAL_TREE} ${LEMON} -I${MINIMAP2_DIR}
+export CXXFLAGS += ${LIBCUCKOO} ${INTERVAL_TREE} ${LEMON} -I${MINIMAP2_DIR} -I ${ROOT_DIR}
 export LDFLAGS += -lz -L${MINIMAP2_DIR} -lminimap2
 
 .PHONY: clean all profile debug minimap2

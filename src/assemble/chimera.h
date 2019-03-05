@@ -6,7 +6,6 @@
 
 #include "../sequence/overlap.h"
 #include "../sequence/sequence_container.h"
-#include <unordered_map>
 
 class ChimeraDetector
 {

@@ -124,7 +124,7 @@ struct GraphEdge
 		return sumLen / seqSegments.size();
 	}
 
-	std::unordered_set<GraphEdge*> adjacentEdges();
+	ska::flat_hash_set<GraphEdge*> adjacentEdges();
 
 	GraphNode* nodeLeft;
 	GraphNode* nodeRight;
@@ -143,9 +143,9 @@ struct GraphNode
 	bool isBifurcation() const
 		{return outEdges.size() != 1 || inEdges.size() != 1;}
 
-	std::unordered_set<GraphNode*> neighbors() const
+	ska::flat_hash_set<GraphNode*> neighbors() const
 	{
-		std::unordered_set<GraphNode*> result;
+		ska::flat_hash_set<GraphNode*> result;
 		for (auto& edge : inEdges) 
 		{
 			if (edge->nodeLeft != this) result.insert(edge->nodeLeft);
@@ -245,9 +245,9 @@ public:
 	public:
 		IterNodes(RepeatGraph& graph): _graph(graph) {}
 
-		std::unordered_set<GraphNode*>::iterator begin() 
+		ska::flat_hash_set<GraphNode*>::iterator begin() 
 			{return _graph._graphNodes.begin();}
-		std::unordered_set<GraphNode*>::iterator end() 
+		ska::flat_hash_set<GraphNode*>::iterator end() 
 			{return _graph._graphNodes.end();}
 	
 	private:
@@ -285,9 +285,9 @@ public:
 	public:
 		IterEdges(RepeatGraph& graph): _graph(graph) {}
 
-		std::unordered_set<GraphEdge*>::iterator begin() 
+		ska::flat_hash_set<GraphEdge*>::iterator begin() 
 			{return _graph._graphEdges.begin();}
-		std::unordered_set<GraphEdge*>::iterator end() 
+		ska::flat_hash_set<GraphEdge*>::iterator end() 
 			{return _graph._graphEdges.end();}
 	
 	private:
@@ -304,7 +304,7 @@ public:
 	}
 	void removeNode(GraphNode* node)
 	{
-		std::unordered_set<GraphEdge*> toRemove;
+		ska::flat_hash_set<GraphEdge*> toRemove;
 		for (auto& edge : node->outEdges) 
 		{
 			vecRemove(edge->nodeRight->inEdges, edge);
@@ -375,10 +375,10 @@ private:
 	SequenceContainer* 		 _edgeSeqsContainer;
 	const int _maxSeparation = Config::get("max_separation");
 
-	std::unordered_map<FastaRecord::Id, 
+	ska::flat_hash_map<FastaRecord::Id, 
 					   std::vector<GluePoint>> _gluePoints;
 
-	std::unordered_set<GraphNode*> _graphNodes;
-	std::unordered_set<GraphEdge*> _graphEdges;
-	std::unordered_map<FastaRecord::Id, GraphEdge*> _idToEdge;
+	ska::flat_hash_set<GraphNode*> _graphNodes;
+	ska::flat_hash_set<GraphEdge*> _graphEdges;
+	ska::flat_hash_map<FastaRecord::Id, GraphEdge*> _idToEdge;
 };
