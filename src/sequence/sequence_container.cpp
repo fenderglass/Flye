@@ -62,6 +62,13 @@ FastaRecord::Id SequenceContainer::addSequence(const FastaRecord& seqRec)
 	_seqIndex.emplace_back(seqRec.sequence, "+" + seqRec.description, 
 						   newId);
 
+	if (_nameIndex.count(_seqIndex.back().description))
+	{
+		throw ParseException("The input contain reads with duplicated IDs. "
+							 "Make sure all reads have unique IDs and restart. "
+							 "The first problematic ID was: " +
+			 				 _seqIndex.back().description.substr(1));
+	}
 	_nameIndex[_seqIndex.back().description] = _seqIndex.back().id;
 
 	_seqIndex.emplace_back(seqRec.sequence.complement(), 

@@ -14,7 +14,8 @@ from collections import defaultdict
 from threading import Thread
 
 from flye.polishing.alignment import (make_alignment, get_contigs_info,
-                                      SynchronizedSamReader)
+                                      SynchronizedSamReader, merge_chunks,
+                                      split_into_chunks)
 from flye.polishing.bubbles import make_bubbles
 import flye.utils.fasta_parser as fp
 from flye.utils.utils import which
@@ -62,31 +63,38 @@ def polish(contig_seqs, read_seqs, work_dir, num_iters, num_threads, error_mode,
 
     prev_assembly = contig_seqs
     contig_lengths = None
+    coverage_stats = None
     for i in xrange(num_iters):
         logger.info("Polishing genome ({0}/{1})".format(i + 1, num_iters))
 
-        alignment_file = os.path.join(work_dir,
-                                      "minimap_{0}.sam".format(i + 1))
+        #split into 1Mb chunks to reduce RAM usage
+        #slightly vary chunk size between iterations
+        CHUNK_SIZE = 1000000 - (i % 2) * 100000
+        chunks_file = os.path.join(work_dir, "chunks_{0}.fasta".format(i + 1))
+        chunks = split_into_chunks(fp.read_sequence_dict(prev_assembly),
+                                       CHUNK_SIZE)
+        fp.write_fasta_dict(chunks, chunks_file)
+
+        ####
         logger.info("Running minimap2")
-        make_alignment(prev_assembly, read_seqs, num_threads,
+        alignment_file = os.path.join(work_dir, "minimap_{0}.sam".format(i + 1))
+        make_alignment(chunks_file, read_seqs, num_threads,
                        work_dir, error_mode, alignment_file,
                        reference_mode=True, sam_output=True)
 
+        #####
         logger.info("Separating alignment into bubbles")
-        contigs_info = get_contigs_info(prev_assembly)
+        contigs_info = get_contigs_info(chunks_file)
         bubbles_file = os.path.join(work_dir,
                                     "bubbles_{0}.fasta".format(i + 1))
         coverage_stats, mean_aln_error = \
-            make_bubbles(alignment_file, contigs_info, prev_assembly,
+            make_bubbles(alignment_file, contigs_info, chunks_file,
                          error_mode, num_threads,
                          bubbles_file)
-        logger.info("Alignment error rate: {0}".format(mean_aln_error))
 
-        logger.info("Correcting bubbles")
-        consensus_out = os.path.join(work_dir, "consensus_{0}.fasta"
-                                     .format(i + 1))
-        polished_file = os.path.join(work_dir, "polished_{0}.fasta"
-                                     .format(i + 1))
+        logger.info("Alignment error rate: {0}".format(mean_aln_error))
+        consensus_out = os.path.join(work_dir, "consensus_{0}.fasta".format(i + 1))
+        polished_file = os.path.join(work_dir, "polished_{0}.fasta".format(i + 1))
         if os.path.getsize(bubbles_file) == 0:
             logger.info("No reads were aligned during polishing")
             if not output_progress:
@@ -94,15 +102,28 @@ def polish(contig_seqs, read_seqs, work_dir, num_iters, num_threads, error_mode,
             open(stats_file, "w").write("seq_name\tlength\tcoverage\n")
             open(polished_file, "w")
             return polished_file, stats_file
-            #return None, None
 
+        #####
+        logger.info("Correcting bubbles")
         _run_polish_bin(bubbles_file, subs_matrix, hopo_matrix,
                         consensus_out, num_threads, output_progress)
-        polished_fasta, polished_lengths = _compose_sequence([consensus_out])
-        fp.write_fasta_dict(polished_fasta, polished_file)
+        polished_fasta, polished_lengths = _compose_sequence(consensus_out)
+        merged_chunks = merge_chunks(polished_fasta)
+        fp.write_fasta_dict(merged_chunks, polished_file)
+
+        #Cleanup
+        os.remove(chunks_file)
+        os.remove(bubbles_file)
+        os.remove(consensus_out)
+        os.remove(alignment_file)
 
         contig_lengths = polished_lengths
         prev_assembly = polished_file
+
+    #merge information from chunks
+    contig_lengths = merge_chunks(contig_lengths, fold_function=sum)
+    coverage_stats = merge_chunks(coverage_stats,
+                                  fold_function=lambda l: sum(l) / len(l))
 
     with open(stats_file, "w") as f:
         f.write("seq_name\tlength\tcoverage\n")
@@ -180,6 +201,7 @@ def generate_polished_edges(edges_file, gfa_file, polished_contigs, work_dir,
 
     logger.debug("{0} sequences remained unpolished"
                     .format(len(edges_dict) - updated_seqs))
+    os.remove(alignment_file)
 
 
 def _run_polish_bin(bubbles_in, subs_matrix, hopo_matrix,
@@ -203,24 +225,23 @@ def _run_polish_bin(bubbles_in, subs_matrix, hopo_matrix,
         raise PolishException(str(e))
 
 
-def _compose_sequence(consensus_files):
+def _compose_sequence(consensus_file):
     """
     Concatenates bubbles consensuses into genome
     """
     consensuses = defaultdict(list)
     coverage = defaultdict(list)
-    for file_name in consensus_files:
-        with open(file_name, "r") as f:
-            header = True
-            for line in f:
-                if header:
-                    tokens = line.strip().split(" ")
-                    ctg_id = tokens[0][1:]
-                    ctg_pos = int(tokens[1])
-                    coverage[ctg_id].append(int(tokens[2]))
-                else:
-                    consensuses[ctg_id].append((ctg_pos, line.strip()))
-                header = not header
+    with open(consensus_file, "r") as f:
+        header = True
+        for line in f:
+            if header:
+                tokens = line.strip().split(" ")
+                ctg_id = tokens[0][1:]
+                ctg_pos = int(tokens[1])
+                coverage[ctg_id].append(int(tokens[2]))
+            else:
+                consensuses[ctg_id].append((ctg_pos, line.strip()))
+            header = not header
 
     polished_fasta = {}
     polished_stats = {}

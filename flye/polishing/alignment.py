@@ -366,6 +366,53 @@ def shift_gaps(seq_trg, seq_qry):
     return "".join(lst_qry[1 : -1])
 
 
+def split_into_chunks(fasta_in, chunk_size):
+    out_dict = {}
+    for header, seq in fasta_in.iteritems():
+        #print len(seq)
+        for i in xrange(0, max(len(seq) / chunk_size, 1)):
+            chunk_hdr = "{0}$chunk_{1}".format(header, i)
+            start = i * chunk_size
+            end = (i + 1) * chunk_size
+            if len(seq) - end < chunk_size:
+                end = len(seq)
+
+            #print(start, end)
+            out_dict[chunk_hdr] = seq[start : end]
+
+    return out_dict
+
+
+def merge_chunks(fasta_in, fold_function=lambda l: "".join(l)):
+    """
+    Merges sequence chunks. Chunk names are in format `orig_name$chunk_id`.
+    Each chunk is as dictionary entry. Value type is arbitrary and
+    one can supply a custom fold function
+    """
+    def name_split(h):
+        orig_hdr, chunk_id = h.rsplit("$", 1)
+        return orig_hdr, int(chunk_id.rsplit("_", 1)[1])
+
+    out_dict = {}
+    cur_seq = []
+    cur_contig = None
+    for hdr in sorted(fasta_in, key=name_split):
+        orig_name, chunk_id = name_split(hdr)
+        if orig_name != cur_contig:
+            if cur_contig != None:
+                out_dict[cur_contig] = fold_function(cur_seq)
+            cur_seq = []
+            cur_contig = orig_name
+        cur_seq.append(fasta_in[hdr])
+
+        #print (hdr, orig_name, chunk_id)
+
+    if cur_seq:
+        out_dict[cur_contig] = fold_function(cur_seq)
+
+    return out_dict
+
+
 def _run_minimap(reference_file, reads_files, num_proc, mode, out_file,
                  sam_output):
     cmdline = [MINIMAP_BIN, reference_file]
