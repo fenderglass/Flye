@@ -18,7 +18,7 @@ void VertexIndex::countKmers(size_t hardThreshold, int genomeSize)
 {
 	if (Parameters::get().kmerSize > 31)
 	{
-		throw std::runtime_error("Maximum kmer size is 31");
+		throw std::runtime_error("Maximum k-mer size is 31");
 	}
 
 	Logger::get().debug() << "Hard threshold set to " << hardThreshold;
@@ -27,7 +27,7 @@ void VertexIndex::countKmers(size_t hardThreshold, int genomeSize)
 		throw std::runtime_error("Wrong hard threshold value: " + 
 								 std::to_string(hardThreshold));
 	}
-	Logger::get().debug() << "Started kmer counting";
+	Logger::get().debug() << "Started k-mer counting";
 
 	size_t preCountSize = 1024 * 1024 * 1024;	//1G by default
 	if (genomeSize > (int)Config::get("big_genome_threshold"))
@@ -44,7 +44,7 @@ void VertexIndex::countKmers(size_t hardThreshold, int genomeSize)
 	}
 
 	//first pass: filling up naive hash counting filter
-	if (_outputProgress) Logger::get().info() << "Counting kmers (1/2):";
+	if (_outputProgress) Logger::get().info() << "Counting k-mers (1/2):";
 	std::function<void(const FastaRecord::Id&)> preCountUpdate = 
 	[&preCounters, hardThreshold, this, preCountSize] 
 		(const FastaRecord::Id& readId)
@@ -90,7 +90,7 @@ void VertexIndex::countKmers(size_t hardThreshold, int genomeSize)
 					  Parameters::get().numThreads, _outputProgress);
 
 	//second pass: counting kmers that have passed the filter
-	if (_outputProgress) Logger::get().info() << "Counting kmers (2/2):";
+	if (_outputProgress) Logger::get().info() << "Counting k-mers (2/2):";
 
 	std::function<void(const FastaRecord::Id&)> countUpdate = 
 	[&preCounters, hardThreshold, this, preCountSize] 
@@ -275,7 +275,7 @@ void VertexIndex::buildIndexUnevenCoverage(int minCoverage, float selectRate,
 				{
 					if (rv.size == rv.capacity) 
 					{
-						Logger::get().warning() << "Index size missmatch " << rv.capacity;
+						Logger::get().warning() << "Index size mismatch " << rv.capacity;
 						return;
 					}
 					size_t globPos = _seqContainer
@@ -304,7 +304,7 @@ void VertexIndex::buildIndexUnevenCoverage(int minCoverage, float selectRate,
 	{
 		totalEntries += kmerRec.second.size;
 	}
-	Logger::get().debug() << "Selected kmers: " << _kmerIndex.size();
+	Logger::get().debug() << "Selected k-mers: " << _kmerIndex.size();
 	Logger::get().debug() << "Index size: " << totalEntries;
 }
 
@@ -346,10 +346,10 @@ void VertexIndex::setRepeatCutoff(int minCoverage)
 		}
 	}
 	float filteredRate = (float)repetitiveKmers / uniqueKmers;
-	Logger::get().debug() << "Repetetive k-mer frequency: " 
+	Logger::get().debug() << "Repetitive k-mer frequency: " 
 						  << _repetitiveFrequency;
 	Logger::get().debug() << "Filtered " << repetitiveKmers 
-						  << " repetitive kmers (" <<
+						  << " repetitive k-mers (" <<
 						  filteredRate << ")";
 }
 
@@ -378,8 +378,8 @@ void VertexIndex::buildIndex(int minCoverage)
 		}
 	}
 	Logger::get().debug() << "Sampling rate: " << _sampleRate;
-	Logger::get().debug() << "Solid kmers: " << solidKmers;
-	Logger::get().debug() << "Kmer index size: " << kmerEntries;
+	Logger::get().debug() << "Solid k-mers: " << solidKmers;
+	Logger::get().debug() << "K-mer index size: " << kmerEntries;
 	Logger::get().debug() << "Mean k-mer frequency: " 
 		<< (float)kmerEntries / solidKmers;
 
