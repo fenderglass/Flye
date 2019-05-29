@@ -427,15 +427,21 @@ def _create_job_list(args, work_dir, log_file):
 
     #Run configuration
     jobs.append(JobConfigure(args, work_dir))
+    if args.run_until.lower() == "configure":
+        return jobs
 
     #Assembly job
     jobs.append(JobAssembly(args, work_dir, log_file))
     disjointigs = jobs[-1].out_files["assembly"]
+    if args.run_until.lower() == "assembly":
+        return jobs
 
     #Consensus
     if args.read_type != "subasm":
         jobs.append(JobConsensus(args, work_dir, disjointigs))
         disjointigs = jobs[-1].out_files["consensus"]
+    if args.run_until.lower() == "consensus":
+        return jobs
 
     #Repeat analysis
     jobs.append(JobRepeat(args, work_dir, log_file, disjointigs))
@@ -443,6 +449,8 @@ def _create_job_list(args, work_dir, log_file):
     repeat_graph_edges = jobs[-1].out_files["repeat_graph_edges"]
     repeat_graph = jobs[-1].out_files["repeat_graph"]
     reads_alignment = jobs[-1].out_files["reads_alignment"]
+    if args.run_until.lower() == "repeatgraph":
+        return jobs
 
     #Trestle: Resolve Unbridged Repeats
     if not args.no_trestle and not args.meta and args.read_type == "raw":
@@ -451,6 +459,8 @@ def _create_job_list(args, work_dir, log_file):
                     reads_alignment))
         repeat_graph_edges = jobs[-1].out_files["repeat_graph_edges"]
         repeat_graph = jobs[-1].out_files["repeat_graph"]
+    if args.run_until.lower() == "trestle":
+        return jobs
 
     #Short plasmids
     if args.plasmids:
@@ -458,6 +468,8 @@ def _create_job_list(args, work_dir, log_file):
                                              repeat_graph, repeat_graph_edges))
         repeat_graph_edges = jobs[-1].out_files["repeat_graph_edges"]
         repeat_graph = jobs[-1].out_files["repeat_graph"]
+    if args.run_until.lower() == "shortplasmids":
+        return jobs
 
     #Contigger
     jobs.append(JobContigger(args, work_dir, log_file, repeat_graph_edges,
@@ -468,6 +480,8 @@ def _create_job_list(args, work_dir, log_file):
     gfa_file = jobs[-1].out_files["gfa_graph"]
     final_graph_edges = jobs[-1].out_files["edges_sequences"]
     repeat_stats = jobs[-1].out_files["stats"]
+    if args.run_until.lower() == "contigger":
+        return jobs
 
     #Polishing
     contigs_file = raw_contigs
@@ -479,6 +493,8 @@ def _create_job_list(args, work_dir, log_file):
         contigs_file = jobs[-1].out_files["contigs"]
         polished_stats = jobs[-1].out_files["stats"]
         polished_gfa = jobs[-1].out_files["polished_gfa"]
+    if args.run_until.lower() == "polishing":
+        return jobs
 
     #Report results
     jobs.append(JobFinalize(args, work_dir, log_file, contigs_file,
@@ -687,6 +703,8 @@ def main():
     parser.add_argument("--resume", action="store_true",
                         dest="resume", default=False,
                         help="resume from the last completed stage")
+    parser.add_argument("--run-until", dest="run_until", default="completion",
+                        help="Run flye pipeline until specified stage")
     parser.add_argument("--resume-from", dest="resume_from", metavar="stage_name",
                         default=None, help="resume from a custom stage")
     #parser.add_argument("--kmer-size", dest="kmer_size",
