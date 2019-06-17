@@ -341,7 +341,7 @@ Finally, Flye performs polishing of the resulting assembly
 to correct the remaining errors:
 
 * Alignment of all reads to the current assembly using minimap2
-* Partition the alignment into into mini-alignments (bubbles)
+* Partition the alignment into mini-alignments (bubbles)
 * Error correction of each bubble using a maximum likelihood approach
 
 The polishing steps could be repeated, which might slightly increase quality for some datasets.
