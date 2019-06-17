@@ -219,7 +219,7 @@ The main output files are:
 
 * `assembly.fasta` - Final assembly. Contains contigs and possibly scaffolds (see below).
 * `assembly_graph.{gfa|gv}` - Final repeat graph. Note that the edge sequences might be
-different (shorter) than contig sequences, because contigs migh include multiple
+different (shorter) than contig sequences, because contigs might include multiple
 graph edges (see below).
 * `assembly_info.txt` - Extra information about contigs (such as length or coverage).
 
