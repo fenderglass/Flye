@@ -21,8 +21,9 @@ usage: flye (--pacbio-raw | --pacbio-corr | --nano-raw |
 	     --nano-corr | --subassemblies) file1 [file_2 ...]
 	     --genome-size SIZE --out-dir PATH
 	     [--threads int] [--iterations int] [--min-overlap int]
-	     [--meta] [--plasmids] [--no-trestle] [--debug]
-	     [--version] [--help] [--resume]
+	     [--meta] [--plasmids] [--no-trestle] [--polish-target]
+	     [--debug] [--version] [--help] [--resume] 
+	     [--resume-from] [--stop-after]
 
 Assembly of long and error-prone reads
 
@@ -48,21 +49,24 @@ optional arguments:
                         number of polishing iterations [1]
   -m int, --min-overlap int
                         minimum overlap between reads [auto]
-  --asm-coverage int    reduced coverage for initial contig assembly [not set]
-  --plasmids            rescue short unassmebled plasmids
+  --asm-coverage int    reduced coverage for initial disjointig assembly [not
+                        set]
+  --plasmids            rescue short unassembled plasmids
   --meta                metagenome / uneven coverage mode
   --no-trestle          skip Trestle stage
   --polish-target path  run polisher on the target sequence
   --resume              resume from the last completed stage
   --resume-from stage_name
                         resume from a custom stage
+  --stop-after stage_name
+                        stop after the specified stage completed
   --debug               enable debug output
   -v, --version         show program's version number and exit
 
 ```
 
 Input reads can be in FASTA or FASTQ format, uncompressed
-or compressed with `.gz`. Currently, raw and corrected reads
+or compressed with `gz`. Currently, raw and corrected reads
 from PacBio and ONT are supported. Expected error rates are
 <30% for raw and <2% for corrected reads. Additionally, the
 `--subassemblies` option performs a consensus assembly of multiple
@@ -78,9 +82,9 @@ of metagenome assembly, the expected total assembly size
 should be provided.
 
 To reduce memory consumption for large genome assemblies,
-you can use a subset of the longest reads for initial contig
+you can use a subset of the longest reads for initial disjointig
 assembly by specifying `--asm-coverage` option. Typically,
-30x coverage is enough to produce good draft contigs.
+30x coverage is enough to produce good disjointigs.
 
 You can separately run Flye polisher on a target sequence 
 using `--polish-target` option.
