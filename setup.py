@@ -35,7 +35,13 @@ class MakeBuild(DistutilsBuild):
         if not find_executable("make"):
             sys.exit("ERROR: 'make' command is unavailable")
         try:
-            subprocess.check_call(["make"])
+            # MAX_JOBS controls the number of core used to build,
+            # it uses all available cores by default.
+            make_cmd = ["make", "-j"]
+            if os.environ.get('MAX_JOBS'):
+                make_cmd.append(os.environ.get('MAX_JOBS'))
+
+            subprocess.check_call(make_cmd)
         except subprocess.CalledProcessError as e:
             sys.exit("Compilation error: ", e)
 

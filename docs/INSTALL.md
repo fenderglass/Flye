@@ -34,7 +34,7 @@ To get and compile the latest git version, run:
 
     git clone https://github.com/fenderglass/Flye
     cd Flye
-    make
+    make -j
 
 Then, Flye will be available as:
 
