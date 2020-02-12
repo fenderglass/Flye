@@ -533,7 +533,7 @@ def _run(args):
     jobs = _create_job_list(args, args.out_dir, args.log_file)
 
     if args.stop_after and not args.stop_after in [j.name for j in jobs]:
-        raise ResumeException("Stop after: unkown stage '{0}'"
+        raise ResumeException("Stop after: unknown stage '{0}'"
                                 .format(args.stop_after))
 
     current_job = 0

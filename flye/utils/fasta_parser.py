@@ -124,7 +124,7 @@ def _is_fastq(filename):
     if suffix in ["fastq", "fq"]:
         return gzipped, True
 
-    raise FastaError("Unkown file extension: " + filename)
+    raise FastaError("Unknown file extension: " + filename)
 
 
 def _read_fasta(file_handle):

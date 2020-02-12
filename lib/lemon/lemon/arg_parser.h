@@ -374,7 +374,7 @@ namespace lemon {
       {
         Opts::const_iterator i = _parser._opts.find(_name);
         LEMON_ASSERT(i!=_parser._opts.end(),
-                     std::string()+"Unkown option: '"+_name+"'");
+                     std::string()+"Unknown option: '"+_name+"'");
         LEMON_ASSERT(i->second.type==ArgParser::BOOL,
                      std::string()+"'"+_name+"' is a bool option");
         return *(i->second.bool_p);
@@ -384,7 +384,7 @@ namespace lemon {
       {
         Opts::const_iterator i = _parser._opts.find(_name);
         LEMON_ASSERT(i!=_parser._opts.end(),
-                     std::string()+"Unkown option: '"+_name+"'");
+                     std::string()+"Unknown option: '"+_name+"'");
         LEMON_ASSERT(i->second.type==ArgParser::STRING,
                      std::string()+"'"+_name+"' is a string option");
         return *(i->second.string_p);
@@ -394,7 +394,7 @@ namespace lemon {
       {
         Opts::const_iterator i = _parser._opts.find(_name);
         LEMON_ASSERT(i!=_parser._opts.end(),
-                     std::string()+"Unkown option: '"+_name+"'");
+                     std::string()+"Unknown option: '"+_name+"'");
         LEMON_ASSERT(i->second.type==ArgParser::DOUBLE ||
                      i->second.type==ArgParser::INTEGER,
                      std::string()+"'"+_name+"' is a floating point option");
@@ -406,7 +406,7 @@ namespace lemon {
       {
         Opts::const_iterator i = _parser._opts.find(_name);
         LEMON_ASSERT(i!=_parser._opts.end(),
-                     std::string()+"Unkown option: '"+_name+"'");
+                     std::string()+"Unknown option: '"+_name+"'");
         LEMON_ASSERT(i->second.type==ArgParser::INTEGER,
                      std::string()+"'"+_name+"' is an integer option");
         return *(i->second.int_p);
