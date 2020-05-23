@@ -117,7 +117,7 @@ Flye benchmarks
 The assemblies generated using Flye 2.7 could be downloaded from [Zenodo](https://zenodo.org/record/3694400).
 All datasets were run with default parameters for the corresponding read type
 with the following exceptions: CHM13 T2T was run with `--min-overlap 10000 --asm-coverage 50`;
-CHM1 was run with `--asm-overage 40`.
+CHM1 was run with `--asm-coverage 40`.
 
 Third-party
 -----------
