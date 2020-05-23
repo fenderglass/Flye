@@ -221,7 +221,7 @@ Typically, assemblies of large genomes at high coverage require
 a hundreds of RAM. For high coverage assemblies, you can reduce memory usage
 by using only a subset of longest reads for initial contig extension
 stage (usually, the memory bottleneck). The parameter `--asm-coverage`
-specifies the target coverage of the longest reads. For a typicall assembly, 30x
+specifies the target coverage of the longest reads. For a typical assembly, 30x
 is enough to produce good initial contigs. Regardless of this parameter,
 all reads will be used at the later pipeline stages.
 
@@ -352,7 +352,7 @@ the `20-repeat/graph_before_rr.gv` file.
 The assemblies generated using Flye 2.7 could be downloaded from [Zenodo](https://zenodo.org/record/3694400).
 All datasets were run with default parameters for the corresponding read type
 with the following exceptions: CHM13 T2T was run with `--min-overlap 10000 --asm-coverage 50`;
-CHM1 was run with `--asm-overage 40`.
+CHM1 was run with `--asm-coverage 40`.
 
 ## <a name="algorithm"></a> Algorithm Description
 
