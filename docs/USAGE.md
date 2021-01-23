@@ -172,7 +172,7 @@ worth checking for possible contamination in the reads.
 
 ### Estimated genome size (optional since 2.8)
 
-No longer reuired as input. However, it must be used in conjunction with
+No longer required as input. However, it must be used in conjunction with
 `--asm-coverage` option.
 
 ### Minimum overlap length
