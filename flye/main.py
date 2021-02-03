@@ -332,6 +332,7 @@ class JobConsensus(Job):
                                              self.args.platform)
 
         #merge chunks back into single sequences
+        logger.info("Merge chunks back into single sequences")
         merged_fasta = aln.merge_chunks(consensus_fasta)
         fp.write_fasta_dict(merged_fasta, self.out_consensus)
         os.remove(chunks_file)

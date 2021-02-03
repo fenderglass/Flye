@@ -57,6 +57,7 @@ def get_consensus(alignment_path, contigs_path, contigs_info, num_proc,
     """
     Main function
     """
+    logger.info("get_consensus(alignment_path: {}, contigs_path: {})".format(alignment_path, contigs_path))
     aln_reader = SynchronizedSamReader(alignment_path,
                                        fp.read_sequence_dict(contigs_path),
                                        max_coverage=cfg.vals["max_read_coverage"],
