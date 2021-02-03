@@ -240,8 +240,11 @@ def _run_minimap(reference_file, reads_files, num_proc, mode, out_file,
         devnull = open(os.devnull, "wb")
         #env = os.environ.copy()
         #env["LC_ALL"] = "C"
-        subprocess.check_call(["/bin/bash", "-c",
-                              "set -o pipefail; " + " ".join(cmdline)],
+
+        command_line = ["/bin/bash", "-c",
+                              "set -o pipefail; " + " ".join(cmdline)]
+        logger.info("Running minimap2 with the following command line: {}".format(command_line))
+        subprocess.check_call(command_line,
                               stderr=open(stderr_file, "w"),
                               stdout=open(out_file, "w"))
         os.remove(stderr_file)
