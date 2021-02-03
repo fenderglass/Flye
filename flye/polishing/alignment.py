@@ -206,8 +206,8 @@ def _run_minimap(reference_file, reads_files, num_proc, mode, out_file,
     SORT_THREADS = "4"
     SORT_MEM = "4G" if os.path.getsize(reference_file) > 100 * 1024 * 1024 else "1G"
 
-    cmdline = [MINIMAP_BIN, reference_file]
-    cmdline.extend(reads_files)
+    cmdline = [MINIMAP_BIN, "'" + reference_file + "'"]
+    cmdline.extend(["'" + read_file + "'" for read_file in reads_files])
     cmdline.extend(["-x", mode, "-t", str(num_proc)])
 
     #Produces gzipped SAM sorted by reference name. Since it's not sorted by
@@ -224,8 +224,8 @@ def _run_minimap(reference_file, reads_files, num_proc, mode, out_file,
                                   "sort_" + datetime.datetime.now().strftime("%y%m%d_%H%M%S"))
         cmdline.extend(["-a", "-p", "0.5", "-N", "10", "--sam-hit-only", "-L",
                         "-z", "1000", "-Q", "--secondary-seq", "-I", "64G"])
-        cmdline.extend(["|", SAMTOOLS_BIN, "view", "-T", reference_file, "-u", "-"])
-        cmdline.extend(["|", SAMTOOLS_BIN, "sort", "-T", tmp_prefix, "-O", "bam",
+        cmdline.extend(["|", SAMTOOLS_BIN, "view", "-T", "'" + reference_file + "'", "-u", "-"])
+        cmdline.extend(["|", SAMTOOLS_BIN, "sort", "-T", "'" + tmp_prefix + "'", "-O", "bam",
                         "-@", SORT_THREADS, "-l", "1", "-m", SORT_MEM])
     else:
         pass    #paf output enabled by default
