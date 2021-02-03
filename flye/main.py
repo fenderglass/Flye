@@ -298,12 +298,14 @@ class JobConsensus(Job):
     def __init__(self, args, work_dir, in_contigs):
         super(JobConsensus, self).__init__()
 
+        logger.info("JobConsensus.__init__(work_dir: {})".format(work_dir))
         self.args = args
         self.in_contigs = in_contigs
         self.consensus_dir = os.path.join(work_dir, "10-consensus")
         self.out_consensus = os.path.join(self.consensus_dir, "consensus.fasta")
         self.name = "consensus"
         self.out_files["consensus"] = self.out_consensus
+        logger.info("JobConsensus.out_consensus: {}".format(self.out_consensus))
 
     def run(self):
         super(JobConsensus, self).run()
