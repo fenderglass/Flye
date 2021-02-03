@@ -84,7 +84,6 @@ def write_fasta_dict(fasta_dict, filename):
     """
     Writes dictionary with fasta to file
     """
-    logger.info("Writing fasta dict to {}".format(filename))
     with open(filename, "w") as f:
         for header in sorted(fasta_dict):
             f.write(">{0}\n".format(header))
