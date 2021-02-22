@@ -182,7 +182,8 @@ int contigger_main(int argc, char** argv)
 	Logger::get().info() << "Reading sequences";
 	SequenceContainer seqGraphEdges; 
 	SequenceContainer seqReads;
-	std::vector<std::string> readsList = splitString(readsFasta, ',');
+	std::vector<std::string> readsList;
+	readsList.push_back(readsFasta);
 	try
 	{
 		seqGraphEdges.loadFromFile(inGraphEdges);
