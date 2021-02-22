@@ -175,7 +175,8 @@ int repeat_main(int argc, char** argv)
 
 	Logger::get().info() << "Parsing disjointigs";
 	SequenceContainer seqAssembly;
-	std::vector<std::string> readsList = splitString(readsFasta, ',');
+	std::vector<std::string> readsList;
+	readsList.push_back(readsFasta);
 	try
 	{
 		seqAssembly.loadFromFile(inAssembly);
