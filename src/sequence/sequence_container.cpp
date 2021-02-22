@@ -30,7 +30,7 @@ bool SequenceContainer::isFasta(const std::string& fileName)
 	size_t dotPos = withoutGz.rfind(".");
 	if (dotPos == std::string::npos)
 	{
-		throw ParseException("Can't identify input file type");
+		throw ParseException("Can't identify input file type: no ending " + withoutGz);
 	}
 	std::string suffix = withoutGz.substr(dotPos + 1);
 
@@ -42,7 +42,7 @@ bool SequenceContainer::isFasta(const std::string& fileName)
 	{
 		return false;
 	}
-	throw ParseException("Can't identify input file type");
+	throw ParseException("Can't identify input file type: unknown ending " + suffix);
 }
 
 FastaRecord::Id SequenceContainer::addSequence(const FastaRecord& seqRec)

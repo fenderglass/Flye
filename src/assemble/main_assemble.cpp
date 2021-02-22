@@ -117,6 +117,10 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 		return false;
 	}
 
+	std::cout << "readsFasta: " << readsFasta << std::endl;
+	std::cout << "outAssembly: " << outAssembly << std::endl;
+	std::cout << "configPath: " << configPath << std::endl;
+
 	return true;
 }
 
@@ -174,7 +178,8 @@ int assemble_main(int argc, char** argv)
 	Parameters::get().minimumOverlap = 1000;
 
 	SequenceContainer readsContainer;
-	std::vector<std::string> readsList = splitString(readsFasta, ',');
+	std::vector<std::string> readsList;
+	readsList.push_back(readsFasta);
 	Logger::get().info() << "Reading sequences";
 	try
 	{

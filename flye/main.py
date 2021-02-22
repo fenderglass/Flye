@@ -521,8 +521,6 @@ def _run_polisher_only(args):
     for read_file in args.reads:
         if not os.path.exists(read_file):
             raise ResumeException("Can't open " + read_file)
-        if " " in read_file:
-            raise ResumeException("Path to reads contain spaces: " + read_file)
 
     pol.polish(args.polish_target, args.reads, args.out_dir,
                args.num_iters, args.threads, args.platform,
@@ -543,8 +541,6 @@ def _run(args):
     for read_file in args.reads:
         if not os.path.exists(read_file):
             raise ResumeException("Can't open " + read_file)
-        if " " in read_file:
-            raise ResumeException("Path to reads contain spaces: " + read_file)
 
     save_file = os.path.join(args.out_dir, "params.json")
     jobs = _create_job_list(args, args.out_dir, args.log_file)
