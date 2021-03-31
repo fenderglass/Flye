@@ -53,7 +53,7 @@ void ContigExtender::generateUnbranchingPaths()
 		}
 	}
 
-	Logger::get().debug() << "Final graph contain " 
+	Logger::get().debug() << "Final graph contains " 
 		<< _unbranchingPaths.size() / 2 << " egdes";
 }
 
