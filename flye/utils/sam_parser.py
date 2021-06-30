@@ -417,12 +417,13 @@ class SynchronizedSamReader(object):
                     div_tag = float(t[5:])
 
             #####
-            if total_clipped > 2000:
-                continue
-            if qry_end - qry_start < 10000:
-                continue
-            if div_tag > 0.1:
-                continue
+            #if total_clipped > 2000:
+            #    continue
+            #if qry_end - qry_start < 10000:
+            #    continue
+            #if div_tag > 0.1:
+            #    continue
+            #####
 
             #OVERHANG = cfg.vals["read_aln_overhang"]
             #if (float(qry_end - qry_start) / qry_len > self.min_aln_rate or

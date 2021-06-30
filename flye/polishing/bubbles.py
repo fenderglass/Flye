@@ -217,11 +217,11 @@ def _postprocess_bubbles(bubbles):
     new_bubbles = []
     empty_bubbles = 0
     for bubble in bubbles:
-        if len(bubble.branches) < 5:
-            new_bubbles.append(Bubble(bubble.contig_id, bubble.position))
-            new_bubbles[-1].consensus = bubble.consensus
-            new_bubbles[-1].branches = [bubble.consensus]
-            #empty_bubbles += 1
+        if len(bubble.branches) < 1:
+            #new_bubbles.append(Bubble(bubble.contig_id, bubble.position))
+            #new_bubbles[-1].consensus = bubble.consensus
+            #new_bubbles[-1].branches = [bubble.consensus]
+            empty_bubbles += 1
             continue
 
         median_branch = sorted(bubble.branches, key=len)[len(bubble.branches) // 2]
