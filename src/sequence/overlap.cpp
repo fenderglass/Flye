@@ -647,7 +647,7 @@ void OverlapContainer::findAllOverlaps()
 	};
 	processInParallel(allQueries, indexUpdate, 
 					  Parameters::get().numThreads, true);
-	this->ensureTransitivity(false);
+	//this->ensureTransitivity(false);
 
 	int numOverlaps = 0;
 	for (const auto& seqOvlps : _overlapIndex.lock_table()) 
@@ -729,6 +729,7 @@ void OverlapContainer::filterOverlaps()
 			}
 			newOvlps.push_back(*maxOvlp);
 		}
+		newOvlps.shrink_to_fit();
 		overlaps = std::move(newOvlps);
 
 		std::sort(overlaps.begin(), overlaps.end(), 
