@@ -708,7 +708,7 @@ def main():
                         default=1, help="number of polishing iterations [1]",
                         metavar="int")
     parser.add_argument("-m", "--min-overlap", dest="min_overlap", metavar="int",
-                        type=lambda v: check_int_range(v, 1000, 10000),
+                        type=lambda v: check_int_range(v, 1000, 1000000),
                         default=None, help="minimum overlap between reads [auto]")
     parser.add_argument("--asm-coverage", dest="asm_coverage", metavar="int",
                         default=None, help="reduced coverage for initial "
