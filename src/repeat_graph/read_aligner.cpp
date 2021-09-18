@@ -153,7 +153,7 @@ std::vector<GraphAlignment>
 	return acceptedAlignments;
 }
 
-void ReadAligner::alignReads()
+void ReadAligner::alignReads(const std::string& kmerWhitelistPath)
 {
 	static const int SMALL_ALN = 100;
 	static const int BIG_ALN = 500;
@@ -179,6 +179,11 @@ void ReadAligner::alignReads()
 	bool useMinimizers = Config::get("use_minimizers");
 	int minWnd = useMinimizers ? Config::get("minimizer_window") : 1;
 	pathsIndex.buildIndexMinimizers(/*min freq*/ 1, minWnd);
+
+	if (!kmerWhitelistPath.empty())
+	{
+		pathsIndex.loadKmerWhitelist(kmerWhitelistPath);
+	}
 
 	//pathsIndex.countKmers(/*min freq*/ 1, /* genome size*/ 0);
 	//pathsIndex.buildIndex(/*min freq*/ 1);

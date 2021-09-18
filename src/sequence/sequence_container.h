@@ -239,6 +239,9 @@ public:
 	}
 	static size_t g_nextSeqId;
 
+	size_t readFasta(std::vector<FastaRecord>& record, 
+				     const std::string& fileName);
+
 private:
 	struct OffsetPair
 	{
@@ -247,9 +250,6 @@ private:
 	};
 
 	FastaRecord::Id addSequence(const FastaRecord& sequence);
-
-	size_t readFasta(std::vector<FastaRecord>& record, 
-				     const std::string& fileName);
 
 	size_t readFastq(std::vector<FastaRecord>& record, 
 				     const std::string& fileName);

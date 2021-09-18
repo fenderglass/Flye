@@ -28,7 +28,7 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 			   std::string& inAssembly, int& kmerSize,
 			   int& minOverlap, bool& debug, size_t& numThreads, 
 			   std::string& configPath, bool& unevenCov,
-			   bool& keepHaplotypes, std::string& extraParams)
+			   bool& keepHaplotypes, std::string& extraParams, std::string& kmerWhitelistPath)
 {
 	auto printUsage = []()
 	{
@@ -71,6 +71,7 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 		{"kmer", required_argument, 0, 0},
 		{"min-ovlp", required_argument, 0, 0},
 		{"extra-params", required_argument, 0, 0},
+		{"kmer-whitelist", required_argument, 0, 0},
 		{"meta", no_argument, 0, 0},
 		{"keep-haplotypes", no_argument, 0, 0},
 		{"debug", no_argument, 0, 0},
@@ -107,6 +108,8 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 				configPath = optarg;
 			else if (!strcmp(longOptions[optionIndex].name, "extra-params"))
 				extraParams = optarg;
+			else if (!strcmp(longOptions[optionIndex].name, "kmer-whitelist"))
+				kmerWhitelistPath = optarg;
 			break;
 
 		case 'h':
@@ -143,9 +146,10 @@ int repeat_main(int argc, char** argv)
 	std::string logFile;
 	std::string configPath;
 	std::string extraParams;
+	std::string kmerWhitelistPath;
 	if (!parseArgs(argc, argv, readsFasta, outFolder, logFile, inAssembly,
 				   kmerSize, minOverlap, debugging, 
-				   numThreads, configPath, isMeta, keepHaplotypes, extraParams))  return 1;
+				   numThreads, configPath, isMeta, keepHaplotypes, extraParams, kmerWhitelistPath))  return 1;
 	
 	Logger::get().setDebugging(debugging);
 	if (!logFile.empty()) Logger::get().setOutputFile(logFile);
@@ -190,7 +194,7 @@ int repeat_main(int argc, char** argv)
 	Logger::get().info() << "Building repeat graph";
 	SequenceContainer edgeSequences;
 	RepeatGraph rg(seqAssembly, &edgeSequences);
-	rg.build();
+	rg.build(kmerWhitelistPath);
 	//rg.validateGraph();
 
 	Logger::get().info() << "Parsing reads";
@@ -212,7 +216,7 @@ int repeat_main(int argc, char** argv)
 
 	Logger::get().info() << "Aligning reads to the graph";
 	ReadAligner aligner(rg, seqReads);
-	aligner.alignReads();
+	aligner.alignReads(kmerWhitelistPath);
 	MultiplicityInferer multInf(rg, aligner, seqAssembly);
 	multInf.estimateCoverage();
 	//aligner.storeAlignments(outFolder + "/read_alignment_before_rr");

@@ -717,6 +717,9 @@ def main():
     parser.add_argument("--extra-params", dest="extra_params",
                         metavar="extra_params", required=False, default=None,
                         help="extra configuration parameters list (comma-separated)")
+    parser.add_argument("--kmer-whitelist", dest="kmer_whitelist",
+                        metavar="kmer_whitelist", required=False, default=None,
+                        help="path to fasta file with pre-definted set of k-mers")
     parser.add_argument("--plasmids", action="store_true",
                         dest="plasmids", default=False,
                         help="unused (retained for backward compatibility)")

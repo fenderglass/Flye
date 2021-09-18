@@ -56,6 +56,9 @@ def analyse_repeats(args, run_params, input_assembly, out_folder,
     if args.extra_params:
         cmdline.extend(["--extra-params", args.extra_params])
 
+    if args.kmer_whitelist:
+        cmdline.extend(["--kmer-whitelist", args.kmer_whitelist])
+
     try:
         logger.debug("Running: " + " ".join(cmdline))
         subprocess.check_call(cmdline)

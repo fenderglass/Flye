@@ -26,7 +26,7 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 			   std::string& outAssembly, std::string& logFile, size_t& genomeSize,
 			   int& kmerSize, bool& debug, size_t& numThreads, int& minOverlap, 
 			   std::string& configPath, int& minReadLength, bool& unevenCov, 
-			   std::string& extraParams, bool& shortMode)
+			   std::string& extraParams, bool& shortMode, std::string& kmerWhitelistPath)
 {
 	auto printUsage = []()
 	{
@@ -70,6 +70,7 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 		{"kmer", required_argument, 0, 0},
 		{"min-ovlp", required_argument, 0, 0},
 		{"extra-params", required_argument, 0, 0},
+		{"kmer-whitelist", required_argument, 0, 0},
 		{"meta", no_argument, 0, 0},
 		{"short", no_argument, 0, 0},
 		{"debug", no_argument, 0, 0},
@@ -108,6 +109,8 @@ bool parseArgs(int argc, char** argv, std::string& readsFasta,
 				configPath = optarg;
 			else if (!strcmp(longOptions[optionIndex].name, "extra-params"))
 				extraParams = optarg;
+			else if (!strcmp(longOptions[optionIndex].name, "kmer-whitelist"))
+				kmerWhitelistPath = optarg;
 			break;
 
 		case 'h':
@@ -204,10 +207,12 @@ int assemble_main(int argc, char** argv)
 	std::string logFile;
 	std::string configPath;
 	std::string extraParams;
+	std::string kmerWhitelistPath;
 
 	if (!parseArgs(argc, argv, readsFasta, outAssembly, logFile, genomeSize,
 				   kmerSize, debugging, numThreads, minOverlap, configPath, 
-				   minReadLength, unevenCov, extraParams, shortMode)) return 1;
+				   minReadLength, unevenCov, extraParams, shortMode,
+				   kmerWhitelistPath)) return 1;
 
 	Logger::get().setDebugging(debugging);
 	if (!logFile.empty()) Logger::get().setOutputFile(logFile);
@@ -261,6 +266,10 @@ int assemble_main(int argc, char** argv)
 	readsContainer.buildPositionIndex();
 	VertexIndex vertexIndex(readsContainer);
 	vertexIndex.outputProgress(true);
+	if (!kmerWhitelistPath.empty())
+	{
+		vertexIndex.loadKmerWhitelist(kmerWhitelistPath);
+	}
 
 	/*int64_t sumLength = 0;
 	for (auto& seq : readsContainer.iterSeqs())

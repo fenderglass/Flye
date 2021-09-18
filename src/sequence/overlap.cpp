@@ -183,6 +183,7 @@ OverlapDetector::getSeqOverlaps(const FastaRecord& fastaRec,
 			continue;
 		}
 		if (!_vertexIndex.kmerFreq(curKmerPos.kmer)) continue;
+		if (!_vertexIndex.isWhitelisted(curKmerPos.kmer)) continue;
 
 		//FastaRecord::Id prevSeqId = FastaRecord::ID_NONE;
 		for (const auto& extReadPos : _vertexIndex.iterKmerPos(curKmerPos.kmer))

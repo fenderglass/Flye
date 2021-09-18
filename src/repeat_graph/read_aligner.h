@@ -24,7 +24,7 @@ public:
 	ReadAligner(RepeatGraph& graph, const SequenceContainer& readSeqs): 
 		_graph(graph), _readSeqs(readSeqs) {}
 
-	void alignReads();
+	void alignReads(const std::string& kmerWhitelistPath);
 	void updateAlignments();
 	const std::vector<GraphAlignment>& getAlignments() const
 		{return _readAlignments;}

@@ -495,3 +495,22 @@ size_t KmerCounter::getKmerNum() const
 	if (!_useFlatCounter) return _hashCounter.size();
 	return _numKmers;
 }
+
+
+void VertexIndex::loadKmerWhitelist(const std::string& fastaPath)
+{
+	std::vector<FastaRecord> kmers;
+	SequenceContainer s;
+	s.readFasta(kmers, fastaPath);
+	for (auto& rec : kmers)
+	{
+		if (rec.sequence.length() != Parameters::get().kmerSize)
+		{
+			throw std::runtime_error("kmer size mismatch");
+		}
+		Kmer kmer(rec.sequence, 0, Parameters::get().kmerSize);
+		kmer.standardForm();
+		_whitelistedKmers.insert(kmer, true);
+	}
+	_kmerWhitelist = true;
+}

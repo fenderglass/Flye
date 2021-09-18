@@ -68,10 +68,14 @@ std::unordered_set<GraphEdge*> GraphEdge::adjacentEdges()
 	return edges;
 }
 
-void RepeatGraph::build()
+void RepeatGraph::build(const std::string& kmerWhitelistPath)
 {
 	//getting overlaps
 	VertexIndex asmIndex(_asmSeqs);
+	if (!kmerWhitelistPath.empty())
+	{
+		asmIndex.loadKmerWhitelist(kmerWhitelistPath);
+	}
 
 	bool useMinimizers = Config::get("use_minimizers");
 	int minWnd = useMinimizers ? Config::get("minimizer_window") : 1;

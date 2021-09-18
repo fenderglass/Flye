@@ -73,6 +73,7 @@ public:
 	VertexIndex(const SequenceContainer& seqContainer):
 		_seqContainer(seqContainer), _outputProgress(false), 
 		_sampleRate(1.0f), _repetitiveFrequency(0),
+		_kmerWhitelist(false),
 		_kmerCounter(seqContainer)
 		//_solidMultiplier(1)
 		//_flankRepeatSize(flankRepeatSize)
@@ -257,7 +258,16 @@ public:
 		//return _kmerDistribution;
 	}
 
+	bool isWhitelisted(Kmer kmer) const
+	{
+		if (!_kmerWhitelist) return true;
+		kmer.standardForm();
+		return _whitelistedKmers.contains(kmer);
+	}
+
 	float getSampleRate() const {return _sampleRate;}
+
+	void loadKmerWhitelist(const std::string& fastaPath);
 
 private:
 	//void setRepeatCutoff(int minCoverage);
@@ -289,6 +299,9 @@ private:
 	cuckoohash_map<Kmer, ReadVector> _kmerIndex;
 	//cuckoohash_map<Kmer, size_t> 	 _kmerCounts;
 	cuckoohash_map<Kmer, char> 	 	 _repetitiveKmers;
+
+	cuckoohash_map<Kmer, char>		 _whitelistedKmers;
+	bool 						     _kmerWhitelist;
 
 	KmerCounter _kmerCounter;
 };

@@ -250,7 +250,7 @@ public:
 	{}
 	~RepeatGraph();
 
-	void build();
+	void build(const std::string& kmerWhitelistPath);
 	void updateEdgeSequences();
 	void storeGraph(const std::string& filename);
 	void loadGraph(const std::string& filename);

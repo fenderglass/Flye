@@ -60,6 +60,9 @@ def assemble(args, run_params, out_file, log_file, config_path):
     if args.extra_params:
         cmdline.extend(["--extra-params", args.extra_params])
 
+    if args.kmer_whitelist:
+        cmdline.extend(["--kmer-whitelist", args.kmer_whitelist])
+
     #if args.min_kmer_count is not None:
     #    cmdline.extend(["-m", str(args.min_kmer_count)])
     #if args.max_kmer_count is not None:
