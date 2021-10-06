@@ -353,7 +353,7 @@ class SynchronizedSamReader(object):
 
         return get_median(all_cov_pos) if all_cov_pos else 0
 
-    def get_alignments(self, region_id, region_start=None, region_end=None):
+    def get_alignments(self, region_id, region_start=None, region_end=None, polish_haplotypes=None):
         parsed_contig = _BYTES(region_id)
         contig_str = self.ref_fasta[parsed_contig]
         if region_start is None:
@@ -407,6 +407,15 @@ class SynchronizedSamReader(object):
             (trg_start, trg_end, trg_len, trg_seq,
             qry_start, qry_end, qry_len, qry_seq, err_rate) = \
                     self._parse_cigar(cigar_str, read_str, contig_str, ctg_pos)
+
+            if polish_haplotypes is not None:
+                hp_tag = None
+                tags = tokens[11:]
+                for t in tags:
+                    if t.startswith(b"HP"):
+                        hp_tag = int(t[5:])
+                if hp_tag not in polish_haplotypes:
+                    continue
 
             #OVERHANG = cfg.vals["read_aln_overhang"]
             #if (float(qry_end - qry_start) / qry_len > self.min_aln_rate or

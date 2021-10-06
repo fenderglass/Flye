@@ -54,7 +54,7 @@ class Bubble(object):
 
 def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
                    results_queue, error_queue, bubbles_file_handle,
-                   bubbles_file_lock):
+                   bubbles_file_lock, polish_haplotypes):
     """
     Will run in parallel
     """
@@ -64,7 +64,7 @@ def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
             if ctg_region is None:
                 break
             ctg_aln = aln_reader.get_alignments(ctg_region.ctg_id, ctg_region.start,
-                                                ctg_region.end)
+                                                ctg_region.end, polish_haplotypes)
             ctg_id = ctg_region.ctg_id
             if len(ctg_aln) == 0:
                 continue
@@ -109,7 +109,7 @@ def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
 
 
 def make_bubbles(alignment_path, contigs_info, contigs_path,
-                 err_mode, num_proc, bubbles_out):
+                 err_mode, num_proc, bubbles_out, polish_haplotypes):
     """
     The main function: takes an alignment and returns bubbles
     """
@@ -127,7 +127,7 @@ def make_bubbles(alignment_path, contigs_info, contigs_path,
     bubbles_out_handle = open(bubbles_out, "w")
 
     process_in_parallel(_thread_worker, (aln_reader, chunk_feeder, contigs_info, err_mode,
-                         results_queue, error_queue, bubbles_out_handle, bubbles_out_lock), num_proc)
+                         results_queue, error_queue, bubbles_out_handle, bubbles_out_lock, polish_haplotypes), num_proc)
     if not error_queue.empty():
         raise error_queue.get()
 

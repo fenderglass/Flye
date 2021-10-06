@@ -356,7 +356,7 @@ class JobPolishing(Job):
         contigs, stats = \
             pol.polish(self.in_contigs, self.args.reads, self.polishing_dir,
                        self.args.num_iters, self.args.threads, self.args.platform,
-                       self.args.read_type, output_progress=True)
+                       self.args.read_type, output_progress=True, polish_haplotypes=None)
         #contigs = os.path.join(self.polishing_dir, "polished_1.fasta")
         #stats = os.path.join(self.polishing_dir, "contigs_stats.txt")
         pol.filter_by_coverage(self.args, stats, contigs,
@@ -522,9 +522,12 @@ def _run_polisher_only(args):
     if bam_input and len(args.reads) > 1:
         raise ResumeException("Only single bam input supported")
 
+    hp_list = None
+    if args.polish_haplotypes is not None:
+        hp_list = [int(x) for x in args.polish_haplotypes.split(",")]
     pol.polish(args.polish_target, args.reads, args.out_dir,
                args.num_iters, args.threads, args.platform,
-               args.read_type, output_progress=True)
+               args.read_type, output_progress=True, polish_haplotypes=hp_list)
     logger.info("Done!")
 
 
@@ -735,6 +738,9 @@ def main():
     parser.add_argument("--polish-target", dest="polish_target",
                         metavar="path", required=False,
                         help="run polisher on the target sequence")
+    parser.add_argument("--polish-haplotypes", dest="polish_haplotypes",
+                        metavar="list", required=False, default=None,
+                        help="list of haplotypes to use for polishing, should be encoded as HP tag in bam")
     parser.add_argument("--resume", action="store_true",
                         dest="resume", default=False,
                         help="resume from the last completed stage")
