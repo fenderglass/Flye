@@ -77,6 +77,12 @@ def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
 
             profile, aln_errors = _compute_profile(ctg_aln, ref_seq)
             partition, num_long_bubbles = _get_partition(profile, err_mode)
+
+            #part_str = "Partition {0} {1} {2}\n".format(ctg_id, ctg_region.start, ctg_region.end)
+            #for p1, p2 in zip(partition[:-1], partition[1:]):
+            #    part_str += "\t" + str(p1 + ctg_region.start) + " " + str(p2 - p1) + "\n"
+            #logger.debug(part_str)
+
             ctg_bubbles = _get_bubble_seqs(ctg_aln, profile, partition, ctg_id)
 
             ##
@@ -219,13 +225,22 @@ def _split_long_bubbles(bubbles):
 def _postprocess_bubbles(bubbles):
     MAX_BUBBLE = cfg.vals["max_bubble_length"]
     MAX_BRANCHES = cfg.vals["max_bubble_branches"]
+    MIN_DEL_BRANCHES = 3
+    delete_coverage_drops = cfg.vals["delete_coverage_drops"]
 
     new_bubbles = []
     empty_bubbles = 0
     for bubble in bubbles:
-        if len(bubble.branches) == 0:
-            empty_bubbles += 1
-            continue
+        if delete_coverage_drops:
+            if len(bubble.branches) == 0:
+                empty_bubbles += 1
+                continue
+        else:
+            if len(bubble.branches) < MIN_DEL_BRANCHES:
+                new_bubbles.append(Bubble(bubble.contig_id, bubble.position))
+                new_bubbles[-1].consensus = bubble.consensus
+                new_bubbles[-1].branches = [bubble.consensus]
+                continue
 
         median_branch = sorted(bubble.branches, key=len)[len(bubble.branches) // 2]
         if len(median_branch) == 0:

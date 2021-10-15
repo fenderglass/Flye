@@ -38,6 +38,7 @@ vals = {
         "max_bubble_branches" : 50,
         "max_read_coverage" : 1000,
         "min_polish_aln_len" : 500,
+        "delete_coverage_drops": False,
 
         #final coverage filtering
         "relative_minimum_coverage" : 5,
