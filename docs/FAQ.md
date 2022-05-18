@@ -100,7 +100,7 @@ What is minimum read coverage required for Flye?
 
 One can typically get satisfying assembly contiguity
 with 30x+ PacBio / ONT reads, if the read length is
-sufficient (e.g. with N50 of severl kb). 
+sufficient (e.g. with N50 of several kb). 
 You might need higher coverage to improve the consensus quality.
 
 Depending on the technology and read length distribution, 
@@ -110,7 +110,7 @@ of datasets with coverage below 10x is not recommended.
 How do I select genome size if I don't know it in advance?
 ----------------------------------------------------------
 
-Genome size parameter is no  longer required since the version 2.8.
+Genome size parameter is no longer required since the version 2.8.
 
 
 I have a seemingly sufficient number of reads, but nothing was assembled. Why is that?
@@ -127,7 +127,7 @@ N90 over 1kb (5kb+ recommended). Flye will not work with reads shorter than 1kb.
 If you have verified that Flye configuration is adequate for your dataset
 and the assembly is still empty, it is very likely that there is simply no
 sufficient overlaps between reads to assemble anything! This often happens with
-metagenomic datasets that were sequences with low read depth.
+metagenomic datasets that were sequenced with low read depth.
 
 My assembly size / contiguity is not what I expected. What parameters can I tweak to fix it?
 --------------------------------------------------------------------------------------------
@@ -193,7 +193,7 @@ But it should be applied with caution to prevent over-correction of repetitive r
 Also see [Watson and Warr paper](https://www.nature.com/articles/s41587-018-0004-z) 
 for a discussion on the assembly quality.
 
-Should I use regulat or error-corrected reads?
+Should I use regular or error-corrected reads?
 ---------------------------------------------
 
 Flye was primarily designed and tested  using regular (uncorrected) reads, so it is always the recommended option.
@@ -212,7 +212,7 @@ Note that in PacBio mode, Flye assumes that the input files represent PacBio sub
 e.g. adaptors and scraps are removed and multiple passes of the same insertion
 sequence are separated. This is typically handled by PacBio instruments/toolchains,
 however we saw examples of problemmatic raw -> fastq conversions, 
-which resulted into incorrectl subreads. In this case, 
+which resulted into incorrect subreads. In this case, 
 consider using [pbclip](https://github.com/fenderglass/pbclip) to fix your Fasta/q reads.
 
 Are cluster environments (SGE / Slurm etc.) supported?
@@ -220,7 +220,7 @@ Are cluster environments (SGE / Slurm etc.) supported?
 
 Currently, cluster environments are not supported. Flye was designed to run on a single
 high-memory node, and it will be difficult to make it run in a distributed environment.
-Note that Flye pipeline has multiple consecutive stages, that are could be resumed and
+Note that Flye pipeline has multiple consecutive stages, that could be resumed and
 run on different machines, if desired.
 
 Can I run the Flye polisher on an existing assembly?
