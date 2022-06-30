@@ -68,14 +68,15 @@ def get_consensus(alignment_path, contigs_path, contigs_info, num_proc,
 
     CHUNK_SIZE = 1000000
     contigs_fasta = fp.read_sequence_dict(contigs_path)
-    aln_reader = SynchronizedSamReader(alignment_path, contigs_fasta,
+    mp_manager = multiprocessing.Manager()
+    aln_reader = SynchronizedSamReader(alignment_path, contigs_fasta, mp_manager,
                                        max_coverage=cfg.vals["max_read_coverage"],
                                        use_secondary=True)
-    chunk_feeder = SynchonizedChunkManager(contigs_fasta, CHUNK_SIZE)
+    chunk_feeder = SynchonizedChunkManager(contigs_fasta, mp_manager, CHUNK_SIZE)
 
-    manager = multiprocessing.Manager()
-    results_queue = manager.Queue()
-    error_queue = manager.Queue()
+    #manager = multiprocessing.Manager()
+    results_queue = mp_manager.Queue()
+    error_queue = mp_manager.Queue()
 
     process_in_parallel(_thread_worker, (aln_reader, chunk_feeder,
                             platform, results_queue, error_queue), num_proc)

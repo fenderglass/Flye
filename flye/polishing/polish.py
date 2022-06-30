@@ -9,7 +9,7 @@ Runs polishing binary in parallel and concatentes output
 from __future__ import absolute_import
 from __future__ import division
 import logging
-import subprocess
+import subprocess, multiprocessing
 import os
 from collections import defaultdict
 
@@ -156,7 +156,7 @@ def generate_polished_edges(edges_file, gfa_file, polished_contigs, work_dir,
                    work_dir, error_mode, alignment_file,
                    reference_mode=True, sam_output=True)
     aln_reader = SynchronizedSamReader(alignment_file,
-                                       polished_dict,
+                                       polished_dict, multiprocessing.Manager(),
                                        cfg.vals["max_read_coverage"])
     aln_by_edge = defaultdict(list)
 

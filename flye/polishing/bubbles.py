@@ -53,7 +53,7 @@ class Bubble(object):
 
 
 def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
-                   results_queue, error_queue, bubbles_file_handle,
+                   results_queue, error_queue, bubbles_file,
                    bubbles_file_lock, polish_haplotypes):
     """
     Will run in parallel
@@ -100,7 +100,7 @@ def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
                 b.position += ctg_region.start
 
             with bubbles_file_lock:
-                _output_bubbles(ctg_bubbles, bubbles_file_handle)
+                _output_bubbles(ctg_bubbles, open(bubbles_file, "a"))
             results_queue.put((ctg_id, len(ctg_bubbles), num_long_bubbles,
                                num_empty, num_long_branch, aln_errors,
                                mean_cov))
@@ -122,18 +122,20 @@ def make_bubbles(alignment_path, contigs_info, contigs_path,
     CHUNK_SIZE = 1000000
 
     contigs_fasta = fp.read_sequence_dict(contigs_path)
-    aln_reader = SynchronizedSamReader(alignment_path, contigs_fasta,
-                                       cfg.vals["max_read_coverage"], use_secondary=True)
-    chunk_feeder = SynchonizedChunkManager(contigs_fasta, chunk_size=CHUNK_SIZE)
-
     manager = multiprocessing.Manager()
+    aln_reader = SynchronizedSamReader(alignment_path, contigs_fasta, manager,
+                                       cfg.vals["max_read_coverage"], use_secondary=True)
+    chunk_feeder = SynchonizedChunkManager(contigs_fasta, manager, chunk_size=CHUNK_SIZE)
+
     results_queue = manager.Queue()
     error_queue = manager.Queue()
     bubbles_out_lock = multiprocessing.Lock()
-    bubbles_out_handle = open(bubbles_out, "w")
+    #bubbles_out_handle = open(bubbles_out, "w")
 
     process_in_parallel(_thread_worker, (aln_reader, chunk_feeder, contigs_info, err_mode,
-                         results_queue, error_queue, bubbles_out_handle, bubbles_out_lock, polish_haplotypes), num_proc)
+                        results_queue, error_queue, bubbles_out, bubbles_out_lock, polish_haplotypes), num_proc)
+    #_thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
+    #               results_queue, error_queue, bubbles_out, bubbles_out_lock)
     if not error_queue.empty():
         raise error_queue.get()
 
@@ -256,7 +258,7 @@ def _postprocess_bubbles(bubbles):
                 new_branches.append(branch)
 
         #checking again (since we might have tossed some branches)
-        if len(bubble.branches) == 0:
+        if len(new_branches) == 0:
             empty_bubbles += 1
             continue
 
@@ -458,27 +460,26 @@ def _get_bubble_seqs(alignment, profile, partition, contig_id):
         bubbles[-1].consensus = "".join(consensus)
 
     for aln in alignment:
-        bubble_id = bisect(partition, aln.trg_start)
+        bubble_id = bisect(ext_partition, aln.trg_start) - 1
         next_bubble_start = ext_partition[bubble_id + 1]
-        chromosome_start = bubble_id == 0
-        chromosome_end = aln.trg_end > partition[-1]
+        chromosome_end = aln.trg_end >= ext_partition[-1]
 
-        branch_start = None
-        first_segment = True
+        incomplete_segment = aln.trg_start > ext_partition[bubble_id]
         trg_pos = aln.trg_start
+        branch_start = 0
         for i, trg_nuc in enumerate(aln.trg_seq):
             if trg_nuc == "-":
                 continue
             #if trg_pos >= contig_info.length:
                 #trg_pos -= contig_info.length
 
-            if trg_pos >= next_bubble_start or trg_pos == 0:
-                if not first_segment or chromosome_start:
+            if trg_pos >= next_bubble_start:
+                if not incomplete_segment:
                     branch_seq = fp.to_acgt(aln.qry_seq[branch_start : i].replace("-", ""))
                     bubbles[bubble_id].branches.append(branch_seq)
 
-                first_segment = False
-                bubble_id = bisect(partition, trg_pos)
+                incomplete_segment = False
+                bubble_id = bisect(ext_partition, trg_pos) - 1
                 next_bubble_start = ext_partition[bubble_id + 1]
                 branch_start = i
 

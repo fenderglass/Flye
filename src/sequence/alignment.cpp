@@ -153,7 +153,24 @@ float getAlignmentCigarKsw(const DnaSequence& trgSeq, size_t trgBegin, size_t tr
 					  trgByte.size(), &trgByte[0], NUM_NUCL,
 					  subsMat, gapOpen, gapExtend, bandWidth, Z_DROP, 
 					  END_BONUS, FLAG, &ez);
-		if (!ez.zdropped) break;
+		if (!ez.zdropped)
+		{
+			//check deviation from the diagonal
+			int64_t deviation = 0;
+			for (size_t i = 0; i < (size_t)ez.n_cigar; ++i)
+			{
+				int32_t size = ez.cigar[i] >> 4;
+				char op = "MID"[ez.cigar[i] & 0xf];
+				if (op == 'I') deviation += size;
+				if (op == 'D') deviation -= size;
+			}
+			if (labs(deviation) > bandWidth)	//looks like this never happens
+			{
+				Logger::get().warning() << "Deviation: " << deviation << " " << bandWidth;
+			}
+			if (labs(deviation) <= bandWidth) break;
+		}
+
 		if (bandWidth > (int)std::max(qryByte.size(), trgByte.size())) break; //just in case
 		bandWidth *= 2;
 	}

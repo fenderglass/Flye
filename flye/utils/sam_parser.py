@@ -129,15 +129,15 @@ class SynchonizedChunkManager(object):
     Stores the list of reference segments / chunks and can
     return them in multiple threds
     """
-    def __init__(self, reference_fasta, chunk_size=None):
+    def __init__(self, reference_fasta, multiproc_manager, chunk_size=None):
         #prepare list of chunks to read
         self.fetch_list = []
         self.chunk_size = chunk_size
 
         #will be shared between processes
-        self.shared_manager = multiprocessing.Manager()
+        #self.shared_manager = multiprocessing.Manager()
         self.shared_num_jobs = multiprocessing.Value(ctypes.c_int, 0)
-        self.shared_lock = self.shared_manager.Lock()
+        self.shared_lock = multiproc_manager.Lock()
         self.shared_eof = multiprocessing.Value(ctypes.c_bool, False)
 
 
@@ -182,7 +182,7 @@ class SynchronizedSamReader(object):
     """
     Parses SAM file in multiple threads.
     """
-    def __init__(self, sam_alignment, reference_fasta,
+    def __init__(self, sam_alignment, reference_fasta, multiproc_manager,
                  max_coverage=None, use_secondary=False):
         #check that alignment exists
         if not os.path.exists(sam_alignment):
@@ -196,8 +196,8 @@ class SynchronizedSamReader(object):
         self.use_secondary = use_secondary
         self.cigar_parser = re.compile(b"[0-9]+[MIDNSHP=X]")
 
-        self.shared_manager = multiprocessing.Manager()
-        self.ref_fasta = self.shared_manager.dict()
+        #self.shared_manager = multiprocessing.Manager()
+        self.ref_fasta = multiproc_manager.dict()
         for (h, s) in iteritems(reference_fasta):
             self.ref_fasta[_BYTES(h)] = _BYTES(s)
 

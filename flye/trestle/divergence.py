@@ -178,11 +178,11 @@ def find_divergence(alignment_path, contigs_path, contigs_info,
         return
 
     contigs_fasta = fp.read_sequence_dict(contigs_path)
-    aln_reader = SynchronizedSamReader(alignment_path, contigs_fasta,
-                                       config.vals["max_read_coverage"])
-    chunk_feeder = SynchonizedChunkManager(contigs_fasta)
-
     manager = multiprocessing.Manager()
+    aln_reader = SynchronizedSamReader(alignment_path, contigs_fasta, manager,
+                                       config.vals["max_read_coverage"])
+    chunk_feeder = SynchonizedChunkManager(contigs_fasta, manager)
+
     results_queue = manager.Queue()
     error_queue = manager.Queue()
 

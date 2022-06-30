@@ -729,6 +729,9 @@ def main():
     parser.add_argument("--keep-haplotypes", action="store_true",
                         dest="keep_haplotypes", default=False,
                         help="do not collapse alternative haplotypes")
+    parser.add_argument("--no-alt-contigs", action="store_true",
+                        dest="no_alt_contigs", default=False,
+                        help="do not output contigs representing alternative haplotypes")
     parser.add_argument("--scaffold", action="store_true",
                         dest="scaffold", default=False,
                         help="enable scaffolding using graph [disabled by default]")
@@ -776,6 +779,13 @@ def main():
             args.extra_params += "," + hifi_str
         else:
             args.extra_params = hifi_str
+
+    if args.no_alt_contigs:
+        alt_params = "remove_alt_edges=1"
+        if args.extra_params:
+            args.extra_params += "," + alt_params
+        else:
+            args.extra_params = "remove_alt_edges=1"
 
     if args.pacbio_raw:
         args.reads = args.pacbio_raw

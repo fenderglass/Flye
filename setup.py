@@ -53,6 +53,9 @@ class MakeInstall(SetuptoolsInstall):
             sys.exit('Error: no write permission for ' + self.install_scripts + '  ' +
                      'Perhaps you need to use sudo?')
 
+        if not os.path.exists(self.install_scripts):
+            os.makedirs(self.install_scripts)
+
         build_dir = os.path.join(script_dir, "bin")
         install_dir = self.install_scripts
         bin_files = ['flye-modules', 'flye-minimap2', 'flye-samtools']

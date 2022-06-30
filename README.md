@@ -142,7 +142,7 @@ All datasets were run with default parameters for the corresponding read type
 with the following exceptions: CHM13 T2T, CHM1 and HG002 were run with `--asm-coverage 50`.
 
 Note that this version of the table reflects contigs NG50, while the previous versions
-were refering to scaffold NG50.
+were referring to scaffold NG50.
 
 
 Third-party
@@ -154,7 +154,7 @@ Flye package includes some third-party software:
 * [intervaltree](https://github.com/ekg/intervaltree)
 * [lemon](http://lemon.cs.elte.hu/trac/lemon)
 * [minimap2](https://github.com/lh3/minimap2)
-* [samtools](https://https://github.com/samtools/samtools)
+* [samtools](https://github.com/samtools/samtools)
 
 
 License
@@ -200,10 +200,10 @@ How to get help
 A preferred way report any problems or ask questions about Flye is the 
 [issue tracker](https://github.com/fenderglass/Flye/issues). 
 Before posting an issue/question, consider to look through the FAQ
-and existing issues (opened and closed) - it is possble that your question
+and existing issues (opened and closed) - it is possible that your question
 has already been answered.
 
-If you reporting a problem, please include the `flye.log` file and provide
+If you are reporting a problem, please include the `flye.log` file and provide
 details about your dataset.
 
 In case you prefer personal communication, please contact Mikhail at fenderglass@gmail.com.

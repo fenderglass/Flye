@@ -560,8 +560,8 @@ void MultiplicityInferer::trimTipsIteration(int& outShort, int& outLong)
 	{
 		if (toRemove.count(path.id))
 		{
-			//Logger::get().debug() << "Tip " << path.edgesStr() 
-			//	<< " len:" << path.length << " cov:" << path.meanCoverage;
+			Logger::get().debug() << "Tip " << path.edgesStr() 
+				<< " len:" << path.length << " cov:" << path.meanCoverage;
 
 			GraphEdge* targetEdge = path.path.front();
 			GraphEdge* complEdge = _graph.complementEdge(targetEdge);
@@ -575,6 +575,16 @@ void MultiplicityInferer::trimTipsIteration(int& outShort, int& outLong)
 			vecRemove(complEdge->nodeRight->inEdges, complEdge);
 			complEdge->nodeRight = _graph.addNode();
 			complEdge->nodeRight->inEdges.push_back(complEdge);
+
+
+			if ((bool)Config::get("remove_alt_edges"))
+			{
+				for (auto& edge : path.path)
+				{
+					_graph.removeEdge(_graph.complementEdge(edge));
+					_graph.removeEdge(edge);
+				}
+			}
 		}
 	}
 	outShort = shortClipped;

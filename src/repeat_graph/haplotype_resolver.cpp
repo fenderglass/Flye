@@ -195,10 +195,10 @@ int HaplotypeResolver::findHeterozygousLoops()
 		_graph.linkEdges(_graph.complementEdge(outEdge),
 						 _graph.complementEdge(inEdge));
 
-		//bridging sequence.
 		//either remove or unroll loop, depending on the coverage
-		if (loop.meanCoverage < 
-			(entrancePath->meanCoverage + exitPath->meanCoverage) / 4)
+		int32_t mainPathCoverage = (entrancePath->meanCoverage + exitPath->meanCoverage) / 2;
+		int32_t LOOP_COV_RATE = 4;	//2 times lower than half coverage (in case of haploid indel)
+		if (loop.meanCoverage < mainPathCoverage / LOOP_COV_RATE)
 		{
 			_bridgingSeqs[std::make_pair(inEdge, outEdge)] = DnaSequence("A");
 			_bridgingSeqs[std::make_pair(_graph.complementEdge(outEdge), 
@@ -648,6 +648,16 @@ void HaplotypeResolver::collapseHaplotypes()
 		}
 	}*/
 
+	if ((bool)Config::get("remove_alt_edges"))
+	{
+		std::unordered_set<GraphEdge*> toDelete;
+		for (auto& edge: _graph.iterEdges())
+		{
+			if (edge->altHaplotype) toDelete.insert(edge);
+		}
+		for (auto& edge : toDelete) _graph.removeEdge(edge);
+	}
+
 	_aligner.updateAlignments();
 	Logger::get().debug() << "[SIMPL] Collapsed " << numBridged << " haplotypes";
 }
@@ -724,7 +734,7 @@ namespace
 	//finds any path of length up to maxDepth from the given edge
 	//(first and last edges do not count towards length).
 	//if there are no paths of that length, return the longest one
-	auto anyPath = [](GraphEdge* startEdge, int maxDepth)
+	auto anyPath = [](GraphEdge* startEdge, int maxDepth, const RepeatGraph& graph)
 	{
 		std::vector<PathWithLen> deadEnds;
 		std::vector<PathWithLen> queue;
@@ -743,7 +753,9 @@ namespace
 			{
 				bool localRepeat = std::find(curPath.path.rbegin(), curPath.path.rend(),
 										  	 nextEdge) != curPath.path.rend();
-				if (localRepeat) continue;
+				bool localComplRepeat = std::find(curPath.path.rbegin(), curPath.path.rend(),
+										  	 	  graph.complementEdge(nextEdge)) != curPath.path.rend();
+				if (localRepeat || localComplRepeat) continue;
 				if (nextEdge->isLooped() && nextEdge->length() < maxDepth) continue;
 				deadEnd = false;
 
@@ -861,7 +873,7 @@ namespace
 								   const std::unordered_set<GraphEdge*> loopedEdges)
 	{
 		//Logger::get().debug() << "\t\tSearching for ref. path";
-		auto refPath = anyPath(startEdge, maxBubbleLen);
+		auto refPath = anyPath(startEdge, maxBubbleLen, graph);
 		if (refPath.empty()) return Superbubble();
 
 		/*std::string pathStr;
@@ -985,19 +997,19 @@ int HaplotypeResolver::findSuperbubbles()
 		
 		//require at least two alternative paths (not counting loops)
 		//to initiate the bubble. No such requirement for the bubble end though
-		//int numIn = 0;
+		int numIn = 0;
 		int numOut = 0;
-		/*for (auto& edge : startEdge->nodeRight->inEdges)
+		for (auto& edge : startEdge->nodeRight->inEdges)
 		{
 			if (!loopedEdges.count(edge)) ++numIn;
-		}*/
+		}
 		for (auto& edge : startEdge->nodeRight->outEdges)
 		{
 			if (!loopedEdges.count(edge)) ++numOut;
 		}
-		if (numOut < 2) continue;
+		//if (numOut < 2) continue;
 		//Logger::get().debug() << "\tChecking start: " << startEdge->edgeId.signedId();
-		//if (numOut < 2 || numIn > 1) continue;
+		if (numOut < 2 || numIn > 1) continue;
 
 		//if (startEdge->nodeRight->inEdges.size() > 1 ||
 		//	startEdge->nodeRight->outEdges.size() < 2) continue;

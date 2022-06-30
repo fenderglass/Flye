@@ -1,6 +1,7 @@
 .PHONY: all clean debug profile
 
 CXXFLAGS += -Wall -Wextra -pthread -std=c++11 -g
+CXXFLAGS += -Wno-missing-field-initializers
 LDFLAGS += -pthread -std=c++11 -rdynamic
 
 MODULES_BIN := ${BIN_DIR}/flye-modules

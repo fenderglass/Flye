@@ -50,11 +50,18 @@ namespace
 
 bool GraphEdge::isRightTerminal() const
 {
+	/*int inCount = 0;
+	int outCount = 0;
 	for (GraphEdge* edge : this->nodeRight->outEdges)
 	{
-		if (!edge->isLooped()) return false;
+		if (!edge->isLooped()) ++outCount;
 	}
-	return true;
+	for (GraphEdge* edge : this->nodeRight->inEdges)
+	{
+		if (!edge->isLooped()) ++inCount;
+	}
+	return inCount == 1 && outCount == 0;*/
+	return this->nodeRight->outEdges.size() == 0 && this->nodeRight->inEdges.size() == 1;
 }
 
 std::unordered_set<GraphEdge*> GraphEdge::adjacentEdges()
