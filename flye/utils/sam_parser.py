@@ -409,7 +409,7 @@ class SynchronizedSamReader(object):
                     self._parse_cigar(cigar_str, read_str, contig_str, ctg_pos)
 
             if polish_haplotypes is not None:
-                hp_tag = None
+                hp_tag = 0  #HP:i:0 if no tag = unphased
                 tags = tokens[11:]
                 for t in tags:
                     if t.startswith(b"HP"):
