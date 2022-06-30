@@ -19,13 +19,16 @@ or local reassembly.
 Are diploid genomes supported?
 ------------------------------
 
-Currently Flye does not explicitly support diploid assemblies. If heterzygosity
-is low, it should not be a problem for contiguity; however similar alternative
-haplotypes could be collapsed. Likewise, SNPs and structural variations between
-the alternative haplotypes will not be captured. If heterozygosity is high,
-Flye will likely recover alternative haplotypes, but will not phase them.
-Because we do not attempt to reconstruct pseudo-haplotypes,
-this will also reduce the overall contiguity.
+Currently Flye will likely produce a collapsed assembly of diploid genomes,
+levaing only one mosaic allele per haplotype. If heterzygosity is low (e.g. ~0.1%), 
+it should not be a problem for contiguity; however  SNPs and structural variations between
+the alternative haplotypes will not be captured. It is now possible to recover two phased haplotypes
+by using [HapDup](https://github.com/fenderglass/hapdup) after the Flye assembly.
+
+If heterozygosity is high, Flye will likely recover alternative haplotypes, but will not phase them.
+Because we currently do not attempt to reconstruct pseudo-haplotypes, this will also reduce the overall contiguity.
+We plan to bring more support for highly heterozygous genome in the future.
+
 
 Are metagenomes supported?
 --------------------------
@@ -50,7 +53,7 @@ Are PacBio CCS/HiFi reads supported?
 
 Yes, use the `--pacbio-hifi` option. 
 
-Are there any special parameters/modes for the newest ONT data (Guppy 5+, Q20)?
+Are there any special parameters/modes for the newest ONT data (Guppy 5+ SUP, Q20)?
 -------------------------------------------------------------------------------
 
 Yes, use the new `--nano-hq` mode.

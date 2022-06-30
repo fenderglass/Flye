@@ -39,5 +39,5 @@ clean:
 	make clean -C src
 	make clean -C ${MINIMAP2_DIR}
 	make clean-all -C ${SAMTOOLS_DIR}
-	rm ${BIN_DIR}/flye-minimap2
-	rm ${BIN_DIR}/flye-samtools
+	rm -f ${BIN_DIR}/flye-minimap2
+	rm -f ${BIN_DIR}/flye-samtools

@@ -5,12 +5,16 @@ Flye assembler
 
 ### Version: 2.9
 
-Flye is a de novo assembler for single molecule sequencing reads,
+Flye is a de novo assembler for single-molecule sequencing reads,
 such as those produced by PacBio and Oxford Nanopore Technologies.
 It is designed for a wide range of datasets, from small bacterial projects
 to large mammalian-scale assemblies. The package represents a complete
 pipeline: it takes raw PacBio / ONT reads as input and outputs polished contigs.
 Flye also has a special mode for metagenome assembly.
+
+Currently, Flye will produce collapsed assemblies of diploid genomes, 
+represented by a single mosaic haplotype. To recover two phased haplotypes
+consider applying [HapDup](https://github.com/fenderglass/hapdup) after the assembly.
 
 Manuals
 -------
@@ -22,12 +26,12 @@ Manuals
 Latest updates
 --------------
 
-### Flye 2.9 release (20 Aug 2022)
-* Better assembly of very short sequences (e.g. plasmids or viruses). They vere often missed in previous versions.
-* New --nano-hq mode for ONT Guppy5+ and Q20 reads (3-5% error rate)
+### Flye 2.9 release (20 Aug 2021)
+* Better assembly of very short sequences (e.g. plasmids or viruses). They were often missed in previous versions.
+* New --nano-hq mode for ONT Guppy5+ (SUP mode) and Q20 reads (3-5% error rate)
 * Optimized default parameters for HiFi (HPC error threshold 0.01 -> 0.001; increased min overlap)
 * Polishing improvements: reduced number of possible clusters of errors
-* Improvements in repeat delection algorithm to further limit a chance of (otherwise infrequent) misassemblies
+* Improvements in repeat detection algorithm to further limit a chance of (otherwise infrequent) misassemblies
 * Scaffolding is no longer performed by default (could be enabled with --scaffold)
 * Bam file input for the standalone polisher (same interface as for FASTA/Q)
 * Automatically selected minimum overlap up to 10k (was 5k)
@@ -35,13 +39,13 @@ Latest updates
 * --trestle and --subassemblies modes are now deprecated, and will be removed in the future versions
 * New --extra-params option to modify config-level parameters
 * Contig paths output in Gfa + number of reads supporting each link (RC tag)
-* Update to minimap 2.19
+* Update to minimap 2.18
 * Several rare bug fixes/other improvements
 
 ### Flye 2.8.3 release (10 Feb 2021)
 * Reduced RAM consumption for some ultra-long ONT datasets
-* Fixed rare artifical sequence insertions on some ONT datasets
-* Asseemblies should be largely identical to 2.8
+* Fixed rare artificial sequence insertions on some ONT datasets
+* Assemblies should be largely identical to 2.8
 
 ### Flye 2.8.2 release (12 Dec 2020)
 * Improvements in GFA output, much faster generation of large and tangled graphs
@@ -55,24 +59,24 @@ Latest updates
 ### Flye 2.8 release (04 Aug 2020)
 * Improvements in contiguity and speed for PacBio HiFi mode
 * Using the `--meta` k-mer selection strategy in isolate assemblies as well.
-This strategy is more robust to drops in coverage/contamination and reqires less memory
+This strategy is more robust to drops in coverage/contamination and requires less memory
 * 1.5-2x RAM footprint reduction for large assemblies (e.g. human ONT assembly now uses 400-500 Gb)
 * Genome size parameter is no longer required (it is still needed for downsampling though `--asm-coverage`)
-* Flye now can occasionally use overlaps shorter than "minOverlap" parameter to close disjointig gaps
+* Flye now can occasionally use overlaps shorter than "minOverlap" parameter to close disjointing gaps
 * Various improvements and bugfixes
 
 
 Repeat graph
 ------------
 
-Flye is using repeat graph as a core data structure. 
-In difference to de Bruijn graphs (which require exact k-mer matches),
+Flye is using a repeat graph as the core data structure. 
+Compared to de Bruijn graphs (which require exact k-mer matches),
 repeat graphs are built using approximate sequence matches, and
-can tolerate higher noise of SMS reads.
+can tolerate the higher noise of SMS reads.
 
-The edges of repeat graph represent genomic sequence, and nodes define
-the junctions. Each edges is classified into unique or repetitive.
-The genome traverses the graph (in an unknown way), so as each unique
+The edges of a repeat graph represent the genomic sequence, and nodes define
+the junctions. Each edge is classified as unique or repetitive.
+The genome traverses the graph (in an unknown way), so each unique
 edge appears exactly once in this traversal. Repeat graphs reveal the
 repeat structure of the genome, which helps to reconstruct an optimal assembly.
 
@@ -82,7 +86,7 @@ repeat structure of the genome, which helps to reconstruct an optimal assembly.
 </p>
 
 Above is an example of the repeat graph of a bacterial assembly.
-Each edge is labeled with its id, length and coverage. Repetitive edges are shown
+Each edge is labeled with its id, length, and coverage. Repetitive edges are shown
 in color, and unique edges are black. Note that each edge is represented in 
 two copies: forward and reverse complement (marked with +/- signs), 
 therefore the entire genome is represented in two copies. This is necessary

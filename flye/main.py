@@ -690,7 +690,7 @@ def main():
                         help="ONT reads that were corrected with other methods (<3%% error)")
     read_group.add_argument("--nano-hq", dest="nano_hq", nargs="+",
                         default=None, metavar="path",
-                        help="ONT high-quality reads: Guppy5+ or Q20 (<5%% error)")
+                        help="ONT high-quality reads: Guppy5+ SUP or Q20 (<5%% error)")
     read_group.add_argument("--subassemblies", dest="subassemblies", nargs="+",
                         default=None, metavar="path",
                         help="[deprecated] high-quality contigs input")

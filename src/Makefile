@@ -63,10 +63,10 @@ main.o: main.cpp
 
 
 clean:
-	-rm ${repeat_obj}
-	-rm ${sequence_obj}
-	-rm ${assemble_obj}
-	-rm ${polish_obj}
-	-rm ${contigger_obj}
-	-rm ${main_obj}
-	-rm ${MODULES_BIN}
+	rm -f ${repeat_obj}
+	rm -f ${sequence_obj}
+	rm -f ${assemble_obj}
+	rm -f ${polish_obj}
+	rm -f ${contigger_obj}
+	rm -f ${main_obj}
+	rm -f ${MODULES_BIN}

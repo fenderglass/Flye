@@ -150,6 +150,7 @@ size_t SequenceContainer::readFasta(std::vector<FastaRecord>& record,
 	auto* fd = gzopen(fileName.c_str(), "rb");
 	if (!fd)
 	{
+		delete[] rawBuffer;
 		throw ParseException("Can't open reads file");
 	}
 
@@ -235,6 +236,7 @@ size_t SequenceContainer::readFastq(std::vector<FastaRecord>& record,
 	auto* fd = gzopen(fileName.c_str(), "rb");
 	if (!fd)
 	{
+		delete[] rawBuffer;
 		throw ParseException("Can't open reads file");
 	}
 

@@ -8,6 +8,7 @@ Table of Contents
 - [Examples](#examples)
 - [Supported Input Data](#inputdata)
 - [Parameter Descriptions](#parameters)
+- [Assembling diploid genomes](#diploid)
 - [Flye output](#output)
 - [Repeat graph](#graph)
 - [Flye benchmarks](#performance)
@@ -42,7 +43,7 @@ optional arguments:
   --nano-corr path [path ...]
                         ONT reads that were corrected with other methods (<3% error)
   --nano-hq path [path ...]
-                        ONT high-quality reads: Guppy5+ or Q20 (<5% error)
+                        ONT high-quality reads: Guppy5+ SUP or Q20 (<5% error)
   --subassemblies path [path ...]
                         [deprecated] high-quality contigs input
   -g size, --genome-size size
@@ -125,7 +126,7 @@ The dataset was originally released by the
 range of datasets, from old R7 pores to the most recent R9.x and R10.x. The
 expected error rate is 10-15%.
 
-* For the most recent ONT data basecalled with Guppy5 use the new `--nano-hq` mode.
+* For the most recent ONT data basecalled with Guppy5+ SUP use the new `--nano-hq` mode.
 Expected error rate is <5%.
 
 * For Q20 data, use a combination of `--nano-hq` and `--read-error 0.03`.
@@ -207,6 +208,7 @@ longer consensus contigs. The option `--keep-haplotypes` retains
 the alternative paths on the graph, producing less contigouos, but
 more detailed assembly.
 
+
 ### Scaffold
 
 Starting from the version 2.9 Flye does not perform scaffolding by default,
@@ -259,6 +261,13 @@ The assembly will continue from the last previously completed step.
 You might also resume from a particular stage with `--resume-from stage_name`,
 where `stage_name` is a choice of `assembly, consensus, repeat, trestle, polishing`.
 For example, you might supply different sets of reads for different stages.
+
+## <a name="diploid"></a> Assembling diploid genomes
+
+Currently Flye will produce collapsed assemblies of diploid genomes, 
+represented by a sigle mosaic haplotype. To recover two phased haplotypes
+consider applying [HapDup](https://github.com/fenderglass/hapdup) after the assembly.
+
 
 ## <a name="output"></a> Flye output
 
