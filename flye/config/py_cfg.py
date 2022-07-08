@@ -38,7 +38,11 @@ vals = {
         "max_bubble_branches" : 50,
         "max_read_coverage" : 1000,
         "min_polish_aln_len" : 500,
+
+        #haplotype-specific
         "delete_coverage_drops": False,
+        "min_reliable_coverage": 10,
+        "min_reliable_mapq": 10,
 
         #final coverage filtering
         "relative_minimum_coverage" : 5,

@@ -20,6 +20,7 @@ from flye.utils.utils import which, get_median
 from flye.utils.sam_parser import AlignmentException
 from flye.six import iteritems
 from flye.six.moves import range
+import flye.config.py_cfg as cfg
 
 
 logger = logging.getLogger()
@@ -93,7 +94,7 @@ def shift_gaps(seq_trg, seq_qry):
     return "".join(lst_qry[1 : -1])
 
 
-def get_uniform_alignments(alignments):
+def get_uniform_alignments(alignments, polish_haplotypes=False):
     """
     Leaves top alignments for each position within contig
     assuming uniform coverage distribution
@@ -102,12 +103,15 @@ def get_uniform_alignments(alignments):
         return []
 
     WINDOW = 100
-    MIN_COV = 20
-    GOOD_RATE = 0.66
-    MIN_QV = 20
+    WINDOW_FIX_RATE = 0.66
+    MIN_COV = cfg.vals["min_reliable_coverage"]
+    MIN_MAPQ = cfg.vals["min_reliable_mapq"]
 
     def is_reliable(aln):
-        return not aln.is_secondary and not aln.is_supplementary and aln.map_qv >= MIN_QV
+        return not aln.is_secondary and \
+               not aln.is_supplementary and \
+               aln.map_qv >= MIN_MAPQ and \
+               (not polish_haplotypes or aln.haplotype != 0)
 
     seq_len = alignments[0].trg_len
     ctg_id = alignments[0].trg_id
@@ -166,7 +170,7 @@ def get_uniform_alignments(alignments):
         aln = sec_aln_scores[aln_id][2]
         #recompute scores
         wnd_good, wnd_bad = _aln_score(aln)
-        to_take = wnd_good / (wnd_good + wnd_bad) > GOOD_RATE
+        to_take = wnd_good / (wnd_good + wnd_bad) > WINDOW_FIX_RATE
         if to_take:
             selected_alignments.append(aln)
             secondary_aln += 1

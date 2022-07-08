@@ -45,7 +45,7 @@ Alignment = namedtuple("Alignment", ["qry_id", "trg_id", "qry_start", "qry_end",
                                      "qry_sign", "qry_len", "trg_start",
                                      "trg_end", "trg_sign", "trg_len",
                                      "qry_seq", "trg_seq", "err_rate",
-                                     "is_secondary", "is_supplementary", "map_qv"])
+                                     "is_secondary", "is_supplementary", "map_qv", "haplotype"])
 
 
 ContigRegion = namedtuple("ContigRegion", ["ctg_id", "start", "end"])
@@ -408,8 +408,8 @@ class SynchronizedSamReader(object):
             qry_start, qry_end, qry_len, qry_seq, err_rate) = \
                     self._parse_cigar(cigar_str, read_str, contig_str, ctg_pos)
 
+            hp_tag = 0  #HP:i:0 if no tag = unphased
             if polish_haplotypes is not None:
-                hp_tag = 0  #HP:i:0 if no tag = unphased
                 tags = tokens[11:]
                 for t in tags:
                     if t.startswith(b"HP"):
@@ -424,7 +424,7 @@ class SynchronizedSamReader(object):
                             qry_start, qry_end, "-" if is_reversed else "+", qry_len,
                             trg_start, trg_end, "+", trg_len,
                             _STR(qry_seq), _STR(trg_seq), err_rate,
-                            is_secondary, is_supplementary, map_qv)
+                            is_secondary, is_supplementary, map_qv, hp_tag)
             alignments.append(aln)
 
             sequence_length += qry_end - qry_start

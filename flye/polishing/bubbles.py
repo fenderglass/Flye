@@ -73,7 +73,7 @@ def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
 
             #since we are working with contig chunks, tranform alignment coorinates
             ctg_aln = aln_reader.trim_and_transpose(ctg_aln, ctg_region.start, ctg_region.end)
-            ctg_aln, mean_cov = get_uniform_alignments(ctg_aln)
+            ctg_aln, mean_cov = get_uniform_alignments(ctg_aln, polish_haplotypes)
 
             profile, aln_errors = _compute_profile(ctg_aln, ref_seq)
             partition, num_long_bubbles = _get_partition(profile, err_mode)
@@ -225,7 +225,6 @@ def _split_long_bubbles(bubbles):
 
 
 def _postprocess_bubbles(bubbles):
-    MAX_BUBBLE = cfg.vals["max_bubble_length"]
     MAX_BRANCHES = cfg.vals["max_bubble_branches"]
     MIN_DEL_BRANCHES = 3
     delete_coverage_drops = cfg.vals["delete_coverage_drops"]
