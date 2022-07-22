@@ -76,7 +76,8 @@ def _thread_worker(aln_reader, chunk_feeder, contigs_info, err_mode,
             ctg_aln, mean_cov = get_uniform_alignments(ctg_aln, polish_haplotypes)
 
             profile, aln_errors = _compute_profile(ctg_aln, ref_seq)
-            partition, num_long_bubbles = _get_partition(profile, err_mode)
+            indels_profile = _get_indel_clusters(ctg_aln, profile, ctg_region.start)
+            partition, num_long_bubbles = _get_partition(profile, indels_profile, err_mode)
 
             #part_str = "Partition {0} {1} {2}\n".format(ctg_id, ctg_region.start, ctg_region.end)
             #for p1, p2 in zip(partition[:-1], partition[1:]):
@@ -279,7 +280,7 @@ def _postprocess_bubbles(bubbles):
     return new_bubbles, empty_bubbles
 
 
-def _is_solid_kmer(profile, position, err_mode):
+def _is_solid_kmer(profile, indels_profile, position, err_mode):
     """
     Checks if the kmer at given position is solid
     """
@@ -289,6 +290,8 @@ def _is_solid_kmer(profile, position, err_mode):
 
     for i in range(position, position + SOLID_LEN):
         if profile[i].coverage == 0:
+            return False
+        if indels_profile[i] > 0:
             return False
         local_missmatch = (profile[i].num_missmatch +
                            profile[i].num_deletions) / profile[i].coverage
@@ -331,6 +334,91 @@ def _is_simple_kmer(profile, position):
     #            return False
 
     return True
+
+
+def _get_indel_clusters(alignment, profile, offset):
+    LARGE_INDEL = 25
+    MERGE_DST = 1000
+
+    insertions = []
+    deletions = []
+    indel_clusters_profile = [0 for _ in range(len(profile))]
+
+    for aln in alignment:
+        qry_seq = aln.qry_seq
+        trg_seq = aln.trg_seq
+
+        trg_gap_len = 0
+        trg_gap_start = 0
+        qry_gap_len = 0
+        qry_gap_start = 0
+
+        trg_pos = aln.trg_start
+        for trg_nuc, qry_nuc in zip(trg_seq, qry_seq):
+            if trg_nuc == "-":
+                trg_pos -= 1
+
+            if trg_nuc == "-":
+                if trg_gap_len == 0:
+                    trg_gap_start = trg_pos
+                trg_gap_len += 1
+            else:
+                if trg_gap_len >= LARGE_INDEL:
+                    insertions.append((trg_gap_start, trg_gap_len, aln.qry_id))
+                trg_gap_len = 0
+
+            if qry_nuc == "-":
+                if qry_gap_len == 0:
+                    qry_gap_start = trg_pos
+                qry_gap_len += 1
+            else:
+                if qry_gap_len >= LARGE_INDEL:
+                    deletions.append((qry_gap_start, qry_gap_len, aln.qry_id))
+                qry_gap_len = 0
+
+            trg_pos += 1
+
+    insertions.sort(key=lambda t: t[0])
+    deletions.sort(key=lambda t: t[0])
+
+    def get_clusters(indels_list, add_last):
+        cur_cluster = []
+        clusters = []
+        for indel in indels_list:
+            if not cur_cluster:
+                cur_cluster.append(indel)
+                continue
+
+            if indel[0] - cur_cluster[-1][0] < MERGE_DST:
+                cur_cluster.append(indel)
+            else:
+                clusters.append(cur_cluster)
+                cur_cluster = []
+
+        for cl in clusters:
+            q_10 = len(cl) // 10
+            #logger.debug(cl)
+            cl_start = cl[q_10][0]
+            cl_end = cl[-1 - q_10][0]
+            if add_last:
+                cl_end += cl[-1][1]
+            region_coverage = (profile[cl_start].coverage + profile[cl_end].coverage) // 2
+            reads = set()
+            for indel in cl:
+                reads.add(indel[2])
+            mean_indel_size = sum([x[1] for x in cl]) // len(cl)
+            support = len(reads) / region_coverage
+
+            if support > 0.5:
+                logger.debug("Indel cluster %s %i %i %d %f %i", alignment[0].trg_id, cl_start + offset,
+                             cl_end - cl_start, mean_indel_size, support, add_last)
+                for i in range(cl_start, cl_end + 1):
+                    indel_clusters_profile[i] = 1
+
+    get_clusters(insertions, add_last=False)
+    get_clusters(deletions, add_last=True)
+
+    return indel_clusters_profile
 
 
 def _compute_profile(alignment, ref_sequence):
@@ -391,25 +479,25 @@ def _compute_profile(alignment, ref_sequence):
                 profile[j].propagated_ins += 1
             for j in range(i + 1, min(i + span + 1, genome_len)):
                 profile[j].propagated_ins += 1
-            
 
     #logger.debug("Filtered: {0} out of {1}".format(filtered, len(alignment)))
     return profile, aln_errors
 
 
-def _get_partition(profile, err_mode):
+def _get_partition(profile, indels_profile, err_mode):
     """
     Partitions genome into sub-alignments at solid regions / simple kmers
     """
     #logger.debug("Partitioning genome")
     SOLID_LEN = cfg.vals["solid_kmer_length"]
     SIMPLE_LEN = cfg.vals["simple_kmer_length"]
-    MAX_BUBBLE = cfg.vals["max_bubble_length"]
+    MAX_LANDMARK_DST = cfg.vals["max_landmark_dst"]
+    #MAX_BUBBLE = cfg.vals["max_bubble_length"]
 
     solid_flags = [False for _ in range(len(profile))]
     prof_pos = 0
     while prof_pos < len(profile) - SOLID_LEN:
-        if _is_solid_kmer(profile, prof_pos, err_mode):
+        if _is_solid_kmer(profile, indels_profile, prof_pos, err_mode):
             for i in range(prof_pos, prof_pos + SOLID_LEN):
                 solid_flags[i] = True
             prof_pos += SOLID_LEN
@@ -426,10 +514,10 @@ def _get_partition(profile, err_mode):
         landmark = (all(solid_flags[prof_pos : prof_pos + SIMPLE_LEN]) and
                     _is_simple_kmer(profile, cur_partition))
 
-        if prof_pos - prev_partition > MAX_BUBBLE:
+        if prof_pos - prev_partition > MAX_LANDMARK_DST:
             long_bubbles += 1
 
-        if landmark or prof_pos - prev_partition > MAX_BUBBLE:
+        if landmark or prof_pos - prev_partition > MAX_LANDMARK_DST:
             partition.append(cur_partition)
             prev_partition = cur_partition
             prof_pos += SOLID_LEN

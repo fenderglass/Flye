@@ -35,6 +35,7 @@ vals = {
         "simple_kmer_length" : 4,
         "solid_kmer_length" : 10,
         "max_bubble_length" : 500,
+        "max_landmark_dst" : 2000,
         "max_bubble_branches" : 50,
         "max_read_coverage" : 1000,
         "min_polish_aln_len" : 500,
