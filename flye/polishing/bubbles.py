@@ -407,7 +407,7 @@ def _get_indel_clusters(alignment, profile, offset):
             for indel in cl:
                 reads.add(indel[2])
             mean_indel_size = sum([x[1] for x in cl]) // len(cl)
-            support = len(reads) / region_coverage
+            support = len(reads) / max(region_coverage, 1)
 
             if support > 0.5:
                 logger.debug("Indel cluster %s %i %i %d %f %i", alignment[0].trg_id, cl_start + offset,
