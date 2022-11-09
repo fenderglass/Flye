@@ -41,7 +41,7 @@ def assemble(args, run_params, out_file, log_file, config_path):
     logger.info("Assembling disjointigs")
     logger.debug("-----Begin assembly log------")
     cmdline = [ASSEMBLE_BIN, "assemble", "--reads", ",".join(args.reads), "--out-asm", out_file,
-               "--config", config_path, "--log", log_file, "--threads", str(args.threads)]
+               "--config", config_path, "--log", log_file, "--threads", str(1 if args.deterministic else args.threads)]
     if args.debug:
         cmdline.append("--debug")
     if args.meta:

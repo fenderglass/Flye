@@ -619,7 +619,8 @@ def _usage():
             "\t     [--meta] [--polish-target] [--min-overlap SIZE]\n"
             "\t     [--keep-haplotypes] [--debug] [--version] [--help] \n"
             "\t     [--scaffold] [--resume] [--resume-from] [--stop-after] \n"
-            "\t     [--read-error float] [--extra-params]")
+            "\t     [--read-error float] [--extra-params] \n"
+            "\t     [--deterministic]")
 
 
 def _epilog():
@@ -752,6 +753,9 @@ def main():
                         dest="debug", default=False,
                         help="enable debug output")
     parser.add_argument("-v", "--version", action="version", version=_version())
+    parser.add_argument("--deterministic", action="store_true",
+                        dest="deterministic", default=False,
+                        help="perform disjointig assembly single-threaded")
     args = parser.parse_args()
 
     if args.asm_coverage and (args.genome_size is None):
