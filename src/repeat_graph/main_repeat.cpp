@@ -251,7 +251,7 @@ int repeat_main(int argc, char** argv)
 		outGen.outputGfa(proc.getEdgesPaths(), outFolder + "/graph_before_rr.gfa");
 	}
 
-	if (isMeta) 
+	if (isMeta && !keepHaplotypes) 
 	{
 		repResolver.resolveSimpleRepeats();
 	}

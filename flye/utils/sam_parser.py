@@ -240,7 +240,7 @@ class SynchronizedSamReader(object):
                     soft_clipped_left += size
                 else:
                     soft_clipped_right += size
-            elif op == b"M":
+            elif op in b"MX=":
                 qry_seq.append(read_str[qry_pos : qry_pos + size].upper())
                 trg_seq.append(ctg_str[trg_pos : trg_pos + size].upper())
                 qry_pos += size
