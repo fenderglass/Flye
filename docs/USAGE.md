@@ -119,6 +119,11 @@ The dataset was originally released by the
     wget https://zenodo.org/record/1172816/files/Loman_E.coli_MAP006-1_2D_50x.fasta
     flye --nano-raw Loman_E.coli_MAP006-1_2D_50x.fasta --out-dir out_nano --threads 4
 
+### Jupyter notebook with the same examples as above
+
+You can also try Flye assembly with [a Jupyter notebook with the same examples as 
+above](https://biotutorials.org/flye). 
+Simply click the link to open the notebook in your browser, and run the examples there.
 
 ## <a name="inputdata"></a> Supported Input Data
 
