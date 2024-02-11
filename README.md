@@ -178,7 +178,7 @@ Publications
 Mikhail Kolmogorov, Derek M. Bickhart, Bahar Behsaz, Alexey Gurevich, Mikhail Rayko, Sung Bong
 Shin, Kristen Kuhn, Jeffrey Yuan, Evgeny Polevikov, Timothy P. L. Smith and Pavel A. Pevzner
 "metaFlye: scalable long-read metagenome assembly using repeat graphs", Nature Methods, 2020
-[doi:s41592-020-00971-x](https://doi.org/10.1038/s41592-020-00971-x)
+[doi:10.1038/s41592-020-00971-x](https://doi.org/10.1038/s41592-020-00971-x)
 
 Mikhail Kolmogorov, Jeffrey Yuan, Yu Lin and Pavel Pevzner, 
 "Assembly of Long Error-Prone Reads Using Repeat Graphs", Nature Biotechnology, 2019
